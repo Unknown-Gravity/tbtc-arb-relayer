@@ -17,18 +17,6 @@ const formatLog = (message) => {
     return `[${APP_NAME}] | ${timestamp} | ${message}`;
 };
 
-/**
- * @name writeToLogFile
- * @description Write the log to a file
- * @param {string} log
- * @param {Error} error
- * @returns {void}
- */
-
-const writeToLogFile = (log, error = "") => {
-    // TODO: Add log to file
-};
-
 // ---------------------------------------------------------------
 // --------------------- LOG FUNCTIONS ---------------------------
 // ---------------------------------------------------------------
@@ -41,7 +29,6 @@ const writeToLogFile = (log, error = "") => {
 const LogMessage = (message) => {
     const log = formatLog(message);
     console.log(log); // NO BORRAR..
-    writeToLogFile(log);
 };
 
 /**
@@ -54,7 +41,6 @@ const LogMessage = (message) => {
 const LogError = (message, error) => {
     const log = formatLog(message);
     console.error(log, error);
-    writeToLogFile(log, error);
 };
 
 /**
@@ -66,7 +52,6 @@ const LogError = (message, error) => {
 const LogWarning = (message) => {
     const log = formatLog(message);
     console.warn(log);
-    writeToLogFile(log);
 };
 
 // ---------------------------------------------------------------

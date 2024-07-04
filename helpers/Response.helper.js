@@ -1,5 +1,3 @@
-const { encodeToken } = require("../utils/SecurityToken");
-
 /**
  * @class Response
  * @description Response helper
@@ -39,14 +37,6 @@ class Response {
         this.res.status(200).send(this.responseJson);
     }
 
-    encodedOk(message, data) {
-        this.responseJson.error = false;
-        this.responseJson.message = message;
-        this.responseJson.data = encodeToken(data);
-
-        return this.responseJson;
-    }
-
     custom(codeStatus, message, err) {
         this.responseJson.error = true;
         this.responseJson.message = message;
@@ -55,23 +45,6 @@ class Response {
         this.res.status(codeStatus).send(this.responseJson);
     }
 
-    /*
-    socket_ok(message) {
-        const response = message;
-        delete this.responseJson.error;
-        this.responseJson = message;
-
-        return this.responseJson;
-    }
-
-    socket_ko(message) {
-        return {
-            error:{
-                message
-            }
-        };
-    }
-    */
 }
 
 module.exports = Response;

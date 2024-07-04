@@ -1,5 +1,4 @@
 const Response = require("../helpers/Response.helper");
-const { checkDbConnection } = require("../services/Database/Database");
 const { LogError } = require("../utils/Logs");
 
 /**
@@ -9,19 +8,19 @@ const { LogError } = require("../utils/Logs");
  * @returns {Object} API information
  */
 const defaultController = (req, res) => {
-    const response = new Response(res);
+	const response = new Response(res);
 
-    // Get API version
-    const version = process.env.APP_VERSION || "1.0.0";
+	// Get API version
+	const version = process.env.APP_VERSION || "1.0.0";
 
-    // Get API name
-    const name = process.env.APP_NAME || "Unknown API";
+	// Get API name
+	const name = process.env.APP_NAME || "Unknown API";
 
-    // Send response
-    response.ok({
-        name,
-        version,
-    });
+	// Send response
+	return response.ok({
+		name,
+		version,
+	});
 };
 
 /**
@@ -31,22 +30,17 @@ const defaultController = (req, res) => {
  * @returns {Object} API status
  **/
 const pingController = async (req, res) => {
-    const response = new Response(res);
+	const response = new Response(res);
 
-    try {
-        const dbConnected = await checkDbConnection();
-
-        response.ok({
-            API: "Fully operational",
-            DB: dbConnected ? "Connected" : "Not connected",
-        });
-    } catch (err) {
-        LogError("🚀 ~ pingController ~ err:", err);
-        response.ko(err.message);
-    }
+	try {
+		return response.ok();
+	} catch (err) {
+		LogError("🚀 ~ pingController ~ err:", err);
+		return response.ko(err.message);
+	}
 };
 
 module.exports = {
-    defaultController,
-    pingController,
+	defaultController,
+	pingController,
 };
