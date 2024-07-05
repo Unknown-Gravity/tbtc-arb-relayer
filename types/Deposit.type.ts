@@ -12,4 +12,10 @@ type Deposit = {
 	};
 	owner: string;
 	status: "QUEUED" | "INITIALIZED" | "FINALIZED" | "CANCELLED";
+	dates: {
+		queuedAt: EpochTimeStamp;
+		initializationAt: EpochTimeStamp;
+		finalizationAt: EpochTimeStamp;
+		cancellationAt: EpochTimeStamp;
+	};
 };

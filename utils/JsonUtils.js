@@ -59,7 +59,7 @@ const checkIfExistJson = (operationId) => {
  * @returns {Array} List of JSON files
  */
 const getAllJsonOperations = async () => {
-	const dirPath = path.resolve(".", "./data/JSON");
+	const dirPath = path.resolve(".", JSON_DIR);
 	const files = await fs.promises.readdir(dirPath);
 	const jsonFiles = files.filter((file) => path.extname(file) === ".json");
 
@@ -76,6 +76,24 @@ const getAllJsonOperations = async () => {
 	const results = await Promise.all(promises);
 	// Clean null values
 	return results.filter((result) => result !== null);
+};
+
+/**
+ * Get all JSON operations in the QUEUED state
+ * @returns {Array} List of JSON operations in the QUEUED state
+ */
+const getAllJsonOperationsQueued = async () => {
+	const operations = await getAllJsonOperations();
+	return operations.filter((operation) => operation.status === "QUEUED");
+};
+
+/**
+ * Get all JSON operations in the FINALIZED state
+ * @returns {Array} List of JSON operations in the FINALIZED state
+ */
+const getAllJsonOperationsFinalized = async () => {
+	const operations = await getAllJsonOperations();
+	return operations.filter((operation) => operation.status === "FINALIZED");
 };
 
 // ---------------------------------------------------------------
@@ -147,4 +165,6 @@ module.exports = {
 	writeJson,
 	deleteJson,
 	getAllJsonOperations,
+	getAllJsonOperationsQueued,
+	getAllJsonOperationsFinalized,
 };
