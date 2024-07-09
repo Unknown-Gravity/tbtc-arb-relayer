@@ -13,7 +13,29 @@ const L2BitcoinDepositor_Address = process.env.L2BitcoinDepositor;
 const provider = new ethers.providers.JsonRpcProvider(RPC);
 
 // Contracts
-export const L1BitcoinDepositor = new ethers.Contract(L1BitcoinDepositor_Address, L1BitcoinDepositorABI, provider);
-export const L2BitcoinDepositor = new ethers.Contract(L2BitcoinDepositor_Address, L2BitcoinDepositorABI, provider);
+const L1BitcoinDepositor = new ethers.Contract(
+  L1BitcoinDepositor_Address,
+  L1BitcoinDepositorABI,
+  providerEth
+);
+const L2BitcoinDepositor = new ethers.Contract(
+  L2BitcoinDepositor_Address,
+  L2BitcoinDepositorABI,
+  providerArb
+);
+
+// Events
+// Hay que encontrar la forma de añadir un listener a L2BitcoinDepositor para el evento de initializer
+L2BitcoinDepositor.on(
+  "DepositInitialized",
+  (fundingTx, reveal, l2DepositOwner, l2Sender) => {
+    console.log("I pressed the button!!");
+  }
+);
+
+module.exports = {
+  L1BitcoinDepositor,
+  L2BitcoinDepositor,
+};
 
 // ---------------------------------------------------------------

@@ -11,3 +11,12 @@ This task should:
 
 More info: https://www.notion.so/thresholdnetwork/L2-tBTC-SDK-Relayer-Implementation-4dfedabfcf594c7d8ef80609541cf791?pvs=4
 */
+const { getAllJsonOperationsInitialized } = require("../utils/JsonUtils");
+
+const finalizeDeposit = async () => {
+  try {
+    const initializedDeposits = getAllJsonOperationsInitialized();
+  } catch (error) {
+    console.error(error);
+  }
+};
