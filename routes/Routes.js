@@ -13,4 +13,7 @@ router.get("/status", Utils.pingController);
 // Diagnostic route for the API
 router.get("/diagnostic", Operations.getAllOperations);
 
+// Test route
+router.get("/test", Utils.test);
+
 module.exports = router;

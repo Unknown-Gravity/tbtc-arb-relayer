@@ -1,4 +1,6 @@
+const { response } = require("express");
 const Response = require("../helpers/Response.helper");
+const { finalizeDeposit } = require("../services/FinalizeDeposits");
 const { LogError } = require("../utils/Logs");
 
 /**
@@ -40,7 +42,16 @@ const pingController = async (req, res) => {
 	}
 };
 
+const test = async (req, res) => {
+	const response = new Response(res);
+	try {
+		finalizeDeposit();
+		response.ok("Todo ok");
+	} catch (error) {}
+};
+
 module.exports = {
 	defaultController,
 	pingController,
+	test,
 };

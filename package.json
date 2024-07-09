@@ -1,22 +1,23 @@
 {
-    "name": "tbtc-relayer",
-    "version": "1.0.0",
-    "description": "Threshold Network tBTC Relayer for Arbitrum",
-    "main": "index.js",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "start": "node --env-file .env index.js",
-        "dev": "node --watch --trace-warnings --env-file .env.dev index.js",
-        "swagger": "node swagger.js"
-    },
-    "keywords": [],
-    "author": "Unknown Gravity | All-in-one Blockchain Company",
-    "license": "ISC",
-    "dependencies": {
-        "compression": "^1.7.4",
-        "cors": "^2.8.5",
-        "ethers": "^6.13.1",
-        "express": "^4.18.2",
-        "helmet": "^7.1.0"
-    }
+	"name": "tbtc-relayer",
+	"version": "1.0.0",
+	"description": "Threshold Network tBTC Relayer for Arbitrum",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"start": "node --env-file .env index.js",
+		"dev": "node --watch --trace-warnings --env-file .env.dev index.js",
+		"swagger": "node swagger.js"
+	},
+	"keywords": [],
+	"author": "Unknown Gravity | All-in-one Blockchain Company",
+	"license": "ISC",
+	"dependencies": {
+		"compression": "^1.7.4",
+		"cors": "^2.8.5",
+		"ethers": "5.7.2",
+		"express": "^4.18.2",
+		"helmet": "^7.1.0",
+		"node-cron": "^3.0.3"
+	}
 }

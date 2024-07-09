@@ -1,13 +1,38 @@
-export const L1BitcoinDepositorABI = [
+const L1BitcoinDepositorABI = [
 	{ inputs: [], stateMutability: "nonpayable", type: "constructor" },
 	{
 		anonymous: false,
 		inputs: [
-			{ indexed: true, internalType: "uint256", name: "depositKey", type: "uint256" },
-			{ indexed: true, internalType: "address", name: "l2DepositOwner", type: "address" },
-			{ indexed: true, internalType: "address", name: "l1Sender", type: "address" },
-			{ indexed: false, internalType: "uint256", name: "initialAmount", type: "uint256" },
-			{ indexed: false, internalType: "uint256", name: "tbtcAmount", type: "uint256" },
+			{
+				indexed: true,
+				internalType: "uint256",
+				name: "depositKey",
+				type: "uint256",
+			},
+			{
+				indexed: true,
+				internalType: "address",
+				name: "l2DepositOwner",
+				type: "address",
+			},
+			{
+				indexed: true,
+				internalType: "address",
+				name: "l1Sender",
+				type: "address",
+			},
+			{
+				indexed: false,
+				internalType: "uint256",
+				name: "initialAmount",
+				type: "uint256",
+			},
+			{
+				indexed: false,
+				internalType: "uint256",
+				name: "tbtcAmount",
+				type: "uint256",
+			},
 		],
 		name: "DepositFinalized",
 		type: "event",
@@ -15,9 +40,24 @@ export const L1BitcoinDepositorABI = [
 	{
 		anonymous: false,
 		inputs: [
-			{ indexed: true, internalType: "uint256", name: "depositKey", type: "uint256" },
-			{ indexed: true, internalType: "address", name: "l2DepositOwner", type: "address" },
-			{ indexed: true, internalType: "address", name: "l1Sender", type: "address" },
+			{
+				indexed: true,
+				internalType: "uint256",
+				name: "depositKey",
+				type: "uint256",
+			},
+			{
+				indexed: true,
+				internalType: "address",
+				name: "l2DepositOwner",
+				type: "address",
+			},
+			{
+				indexed: true,
+				internalType: "address",
+				name: "l1Sender",
+				type: "address",
+			},
 		],
 		name: "DepositInitialized",
 		type: "event",
@@ -25,8 +65,18 @@ export const L1BitcoinDepositorABI = [
 	{
 		anonymous: false,
 		inputs: [
-			{ indexed: false, internalType: "uint256", name: "initializeDepositGasOffset", type: "uint256" },
-			{ indexed: false, internalType: "uint256", name: "finalizeDepositGasOffset", type: "uint256" },
+			{
+				indexed: false,
+				internalType: "uint256",
+				name: "initializeDepositGasOffset",
+				type: "uint256",
+			},
+			{
+				indexed: false,
+				internalType: "uint256",
+				name: "finalizeDepositGasOffset",
+				type: "uint256",
+			},
 		],
 		name: "GasOffsetParametersUpdated",
 		type: "event",
@@ -39,15 +89,32 @@ export const L1BitcoinDepositorABI = [
 	},
 	{
 		anonymous: false,
-		inputs: [{ indexed: false, internalType: "uint256", name: "l2FinalizeDepositGasLimit", type: "uint256" }],
+		inputs: [
+			{
+				indexed: false,
+				internalType: "uint256",
+				name: "l2FinalizeDepositGasLimit",
+				type: "uint256",
+			},
+		],
 		name: "L2FinalizeDepositGasLimitUpdated",
 		type: "event",
 	},
 	{
 		anonymous: false,
 		inputs: [
-			{ indexed: true, internalType: "address", name: "previousOwner", type: "address" },
-			{ indexed: true, internalType: "address", name: "newOwner", type: "address" },
+			{
+				indexed: true,
+				internalType: "address",
+				name: "previousOwner",
+				type: "address",
+			},
+			{
+				indexed: true,
+				internalType: "address",
+				name: "newOwner",
+				type: "address",
+			},
 		],
 		name: "OwnershipTransferred",
 		type: "event",
@@ -55,15 +122,32 @@ export const L1BitcoinDepositorABI = [
 	{
 		anonymous: false,
 		inputs: [
-			{ indexed: true, internalType: "address", name: "_address", type: "address" },
-			{ indexed: false, internalType: "bool", name: "authorization", type: "bool" },
+			{
+				indexed: true,
+				internalType: "address",
+				name: "_address",
+				type: "address",
+			},
+			{
+				indexed: false,
+				internalType: "bool",
+				name: "authorization",
+				type: "bool",
+			},
 		],
 		name: "ReimbursementAuthorizationUpdated",
 		type: "event",
 	},
 	{
 		anonymous: false,
-		inputs: [{ indexed: false, internalType: "address", name: "newReimbursementPool", type: "address" }],
+		inputs: [
+			{
+				indexed: false,
+				internalType: "address",
+				name: "newReimbursementPool",
+				type: "address",
+			},
+		],
 		name: "ReimbursementPoolUpdated",
 		type: "event",
 	},
@@ -91,7 +175,13 @@ export const L1BitcoinDepositorABI = [
 	{
 		inputs: [{ internalType: "uint256", name: "", type: "uint256" }],
 		name: "deposits",
-		outputs: [{ internalType: "enum L1BitcoinDepositor.DepositState", name: "", type: "uint8" }],
+		outputs: [
+			{
+				internalType: "enum L1BitcoinDepositor.DepositState",
+				name: "",
+				type: "uint8",
+			},
+		],
 		stateMutability: "view",
 		type: "function",
 	},
@@ -125,7 +215,11 @@ export const L1BitcoinDepositorABI = [
 			{ internalType: "address", name: "_tbtcVault", type: "address" },
 			{ internalType: "address", name: "_wormhole", type: "address" },
 			{ internalType: "address", name: "_wormholeRelayer", type: "address" },
-			{ internalType: "address", name: "_wormholeTokenBridge", type: "address" },
+			{
+				internalType: "address",
+				name: "_wormholeTokenBridge",
+				type: "address",
+			},
 			{ internalType: "address", name: "_l2WormholeGateway", type: "address" },
 			{ internalType: "uint16", name: "_l2ChainId", type: "uint16" },
 		],
@@ -149,10 +243,22 @@ export const L1BitcoinDepositorABI = [
 			},
 			{
 				components: [
-					{ internalType: "uint32", name: "fundingOutputIndex", type: "uint32" },
+					{
+						internalType: "uint32",
+						name: "fundingOutputIndex",
+						type: "uint32",
+					},
 					{ internalType: "bytes8", name: "blindingFactor", type: "bytes8" },
-					{ internalType: "bytes20", name: "walletPubKeyHash", type: "bytes20" },
-					{ internalType: "bytes20", name: "refundPubKeyHash", type: "bytes20" },
+					{
+						internalType: "bytes20",
+						name: "walletPubKeyHash",
+						type: "bytes20",
+					},
+					{
+						internalType: "bytes20",
+						name: "refundPubKeyHash",
+						type: "bytes20",
+					},
 					{ internalType: "bytes4", name: "refundLocktime", type: "bytes4" },
 					{ internalType: "address", name: "vault", type: "address" },
 				],
@@ -230,7 +336,13 @@ export const L1BitcoinDepositorABI = [
 		stateMutability: "view",
 		type: "function",
 	},
-	{ inputs: [], name: "renounceOwnership", outputs: [], stateMutability: "nonpayable", type: "function" },
+	{
+		inputs: [],
+		name: "renounceOwnership",
+		outputs: [],
+		stateMutability: "nonpayable",
+		type: "function",
+	},
 	{
 		inputs: [],
 		name: "tbtcToken",
@@ -254,8 +366,16 @@ export const L1BitcoinDepositorABI = [
 	},
 	{
 		inputs: [
-			{ internalType: "uint256", name: "_initializeDepositGasOffset", type: "uint256" },
-			{ internalType: "uint256", name: "_finalizeDepositGasOffset", type: "uint256" },
+			{
+				internalType: "uint256",
+				name: "_initializeDepositGasOffset",
+				type: "uint256",
+			},
+			{
+				internalType: "uint256",
+				name: "_finalizeDepositGasOffset",
+				type: "uint256",
+			},
 		],
 		name: "updateGasOffsetParameters",
 		outputs: [],
@@ -263,7 +383,13 @@ export const L1BitcoinDepositorABI = [
 		type: "function",
 	},
 	{
-		inputs: [{ internalType: "uint256", name: "_l2FinalizeDepositGasLimit", type: "uint256" }],
+		inputs: [
+			{
+				internalType: "uint256",
+				name: "_l2FinalizeDepositGasLimit",
+				type: "uint256",
+			},
+		],
 		name: "updateL2FinalizeDepositGasLimit",
 		outputs: [],
 		stateMutability: "nonpayable",
@@ -280,7 +406,13 @@ export const L1BitcoinDepositorABI = [
 		type: "function",
 	},
 	{
-		inputs: [{ internalType: "contract ReimbursementPool", name: "_reimbursementPool", type: "address" }],
+		inputs: [
+			{
+				internalType: "contract ReimbursementPool",
+				name: "_reimbursementPool",
+				type: "address",
+			},
+		],
 		name: "updateReimbursementPool",
 		outputs: [],
 		stateMutability: "nonpayable",
@@ -303,8 +435,16 @@ export const L1BitcoinDepositorABI = [
 	{
 		inputs: [],
 		name: "wormholeTokenBridge",
-		outputs: [{ internalType: "contract IWormholeTokenBridge", name: "", type: "address" }],
+		outputs: [
+			{
+				internalType: "contract IWormholeTokenBridge",
+				name: "",
+				type: "address",
+			},
+		],
 		stateMutability: "view",
 		type: "function",
 	},
 ];
+
+module.exports = { L1BitcoinDepositorABI };

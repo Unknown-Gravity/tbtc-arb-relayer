@@ -1,41 +1,229 @@
 const { ethers } = require("ethers");
 const { L1BitcoinDepositorABI } = require("../interfaces/L1BitcoinDepositor");
 const { L2BitcoinDepositorABI } = require("../interfaces/L2BitcoinDepositor");
+const TestContractABI = require("../interfaces/TestContract");
+// const { finalizeDeposit } = require("./FinalizeDeposits.js");
 
 // ---------------------------------------------------------------
 
 // Environment Variables
-const RPC = process.env.ArbitrumRPC;
+const ArbitrumRPC = process.env.ArbitrumRPC;
+const EthereumRPC = process.env.EthereumRPC;
 const L1BitcoinDepositor_Address = process.env.L1BitcoinDepositor;
 const L2BitcoinDepositor_Address = process.env.L2BitcoinDepositor;
+const TestContract_Address = process.env.TestContract;
 
 // Provider
-const provider = new ethers.providers.JsonRpcProvider(RPC);
+const providerArb = new ethers.providers.JsonRpcProvider(ArbitrumRPC);
+
+const providerEth = new ethers.providers.JsonRpcProvider(EthereumRPC);
 
 // Contracts
-const L1BitcoinDepositor = new ethers.Contract(
-  L1BitcoinDepositor_Address,
-  L1BitcoinDepositorABI,
-  providerEth
-);
-const L2BitcoinDepositor = new ethers.Contract(
-  L2BitcoinDepositor_Address,
-  L2BitcoinDepositorABI,
-  providerArb
-);
 
+const L1BitcoinDepositor = new ethers.Contract(L1BitcoinDepositor_Address, L1BitcoinDepositorABI, providerEth);
+const L2BitcoinDepositor = new ethers.Contract(L2BitcoinDepositor_Address, L2BitcoinDepositorABI, providerArb);
+const TestContract = new ethers.Contract(TestContract_Address, TestContractABI, providerEth);
 // Events
 // Hay que encontrar la forma de añadir un listener a L2BitcoinDepositor para el evento de initializer
-L2BitcoinDepositor.on(
-  "DepositInitialized",
-  (fundingTx, reveal, l2DepositOwner, l2Sender) => {
-    console.log("I pressed the button!!");
-  }
-);
+L2BitcoinDepositor.on("DepositInitialized", (fundingTx, reveal, l2DepositOwner, l2Sender) => {
+	console.log("I pressed the button!!");
+});
 
 module.exports = {
-  L1BitcoinDepositor,
-  L2BitcoinDepositor,
+	L1BitcoinDepositor,
+	L2BitcoinDepositor,
+	TestContract,
 };
 
 // ---------------------------------------------------------------
+/* {
+  version: [Getter],
+  decodeBytes32String: [Getter],
+  encodeBytes32String: [Getter],
+  AbiCoder: [Getter],
+  ConstructorFragment: [Getter],
+  ErrorFragment: [Getter],
+  EventFragment: [Getter],
+  Fragment: [Getter],
+  FallbackFragment: [Getter],
+  FunctionFragment: [Getter],
+  NamedFragment: [Getter],
+  ParamType: [Getter],
+  StructFragment: [Getter],
+  checkResultErrors: [Getter],
+  ErrorDescription: [Getter],
+  Indexed: [Getter],
+  Interface: [Getter],
+  LogDescription: [Getter],
+  Result: [Getter],
+  TransactionDescription: [Getter],
+  Typed: [Getter],
+  getAddress: [Getter],
+  getIcapAddress: [Getter],
+  getCreateAddress: [Getter],
+  getCreate2Address: [Getter],
+  isAddressable: [Getter],
+  isAddress: [Getter],
+  resolveAddress: [Getter],
+  ZeroAddress: [Getter],
+  WeiPerEther: [Getter],
+  MaxUint256: [Getter],
+  MinInt256: [Getter],
+  MaxInt256: [Getter],
+  N: [Getter],
+  ZeroHash: [Getter],
+  EtherSymbol: [Getter],
+  MessagePrefix: [Getter],
+  BaseContract: [Getter],
+  Contract: [Getter],
+  ContractFactory: [Getter],
+  ContractEventPayload: [Getter],
+  ContractTransactionReceipt: [Getter],
+  ContractTransactionResponse: [Getter],
+  ContractUnknownEventPayload: [Getter],
+  EventLog: [Getter],
+  UndecodedEventLog: [Getter],
+  computeHmac: [Getter],
+  randomBytes: [Getter],
+  keccak256: [Getter],
+  ripemd160: [Getter],
+  sha256: [Getter],
+  sha512: [Getter],
+  pbkdf2: [Getter],
+  scrypt: [Getter],
+  scryptSync: [Getter],
+  lock: [Getter],
+  Signature: [Getter],
+  SigningKey: [Getter],
+  id: [Getter],
+  ensNormalize: [Getter],
+  isValidName: [Getter],
+  namehash: [Getter],
+  dnsEncode: [Getter],
+  hashMessage: [Getter],
+  verifyMessage: [Getter],
+  solidityPacked: [Getter],
+  solidityPackedKeccak256: [Getter],
+  solidityPackedSha256: [Getter],
+  TypedDataEncoder: [Getter],
+  verifyTypedData: [Getter],
+  getDefaultProvider: [Getter],
+  Block: [Getter],
+  FeeData: [Getter],
+  Log: [Getter],
+  TransactionReceipt: [Getter],
+  TransactionResponse: [Getter],
+  AbstractSigner: [Getter],
+  NonceManager: [Getter],
+  VoidSigner: [Getter],
+  AbstractProvider: [Getter],
+  FallbackProvider: [Getter],
+  JsonRpcApiProvider: [Getter],
+  JsonRpcProvider: [Getter],
+  JsonRpcSigner: [Getter],
+  BrowserProvider: [Getter],
+  AlchemyProvider: [Getter],
+  AnkrProvider: [Getter],
+  ChainstackProvider: [Getter],
+  CloudflareProvider: [Getter],
+  EtherscanProvider: [Getter],
+  InfuraProvider: [Getter],
+  InfuraWebSocketProvider: [Getter],
+  PocketProvider: [Getter],
+  QuickNodeProvider: [Getter],
+  IpcSocketProvider: [Getter],
+  SocketProvider: [Getter],
+  WebSocketProvider: [Getter],
+  EnsResolver: [Getter],
+  Network: [Getter],
+  EnsPlugin: [Getter],
+  EtherscanPlugin: [Getter],
+  FeeDataNetworkPlugin: [Getter],
+  FetchUrlFeeDataNetworkPlugin: [Getter],
+  GasCostPlugin: [Getter],
+  NetworkPlugin: [Getter],
+  MulticoinProviderPlugin: [Getter],
+  SocketBlockSubscriber: [Getter],
+  SocketEventSubscriber: [Getter],
+  SocketPendingSubscriber: [Getter],
+  SocketSubscriber: [Getter],
+  UnmanagedSubscriber: [Getter],
+  copyRequest: [Getter],
+  showThrottleMessage: [Getter],
+  accessListify: [Getter],
+  computeAddress: [Getter],
+  recoverAddress: [Getter],
+  Transaction: [Getter],
+  decodeBase58: [Getter],
+  encodeBase58: [Getter],
+  decodeBase64: [Getter],
+  encodeBase64: [Getter],
+  concat: [Getter],
+  dataLength: [Getter],
+  dataSlice: [Getter],
+  getBytes: [Getter],
+  getBytesCopy: [Getter],
+  hexlify: [Getter],
+  isHexString: [Getter],
+  isBytesLike: [Getter],
+  stripZerosLeft: [Getter],
+  zeroPadBytes: [Getter],
+  zeroPadValue: [Getter],
+  defineProperties: [Getter],
+  resolveProperties: [Getter],
+  assert: [Getter],
+  assertArgument: [Getter],
+  assertArgumentCount: [Getter],
+  assertNormalize: [Getter],
+  assertPrivate: [Getter],
+  makeError: [Getter],
+  isCallException: [Getter],
+  isError: [Getter],
+  EventPayload: [Getter],
+  FetchRequest: [Getter],
+  FetchResponse: [Getter],
+  FetchCancelSignal: [Getter],
+  FixedNumber: [Getter],
+  getBigInt: [Getter],
+  getNumber: [Getter],
+  getUint: [Getter],
+  toBeArray: [Getter],
+  toBigInt: [Getter],
+  toBeHex: [Getter],
+  toNumber: [Getter],
+  toQuantity: [Getter],
+  fromTwos: [Getter],
+  toTwos: [Getter],
+  mask: [Getter],
+  formatEther: [Getter],
+  parseEther: [Getter],
+  formatUnits: [Getter],
+  parseUnits: [Getter],
+  toUtf8Bytes: [Getter],
+  toUtf8CodePoints: [Getter],
+  toUtf8String: [Getter],
+  Utf8ErrorFuncs: [Getter],
+  decodeRlp: [Getter],
+  encodeRlp: [Getter],
+  uuidV4: [Getter],
+  Mnemonic: [Getter],
+  BaseWallet: [Getter],
+  HDNodeWallet: [Getter],
+  HDNodeVoidWallet: [Getter],
+  Wallet: [Getter],
+  defaultPath: [Getter],
+  getAccountPath: [Getter],
+  getIndexedAccountPath: [Getter],
+  isCrowdsaleJson: [Getter],
+  isKeystoreJson: [Getter],
+  decryptCrowdsaleJson: [Getter],
+  decryptKeystoreJsonSync: [Getter],
+  decryptKeystoreJson: [Getter],
+  encryptKeystoreJson: [Getter],
+  encryptKeystoreJsonSync: [Getter],
+  Wordlist: [Getter],
+  LangEn: [Getter],
+  WordlistOwl: [Getter],
+  WordlistOwlA: [Getter],
+  wordlists: [Getter]
+} */
