@@ -12,27 +12,30 @@ This task should:
 More info: https://www.notion.so/thresholdnetwork/L2-tBTC-SDK-Relayer-Implementation-4dfedabfcf594c7d8ef80609541cf791?pvs=4
 */
 
+import { Deserializer } from "v8";
 import { Deposit } from "../types/Deposit.type";
 import { getAllJsonOperationsInitialized } from "../utils/JsonUtils";
-import { LogError } from "../utils/Logs";
+import { LogError, LogWarning } from "../utils/Logs";
 import { checkAndWriteJson } from "./FinalizeDepositServices/CheckAndWriteJson";
-const cron = require("node-cron");
 
-// const { LogError } = require("../utils/Logs.js");
+/**
+ * @name finalizeDeposit
+ * @description Retrieves all deposits that are in the initialized state and attempts to update their status to "FINALIZED" by checking and updating the JSON storage.
+ * @returns {Promise<void>} A promise that resolves when all deposits have been checked and their statuses have been updated.
+ */
 
-export const finalizeDeposit = async () => {
+export const finalizeDeposit = async (): Promise<void> => {
 	try {
-		const initializedDeposits = await getAllJsonOperationsInitialized();
-		const promises = initializedDeposits.map(async (deposit: Deposit) => {
-			checkAndWriteJson(deposit);
-		});
-		await Promise.all(promises);
-	} catch (error: unknown) {
+		const initializedDeposits: Deposit[] = await getAllJsonOperationsInitialized();
+		if (initializedDeposits.length > 0) {
+			const promises: Promise<void>[] = initializedDeposits.map(async (deposit: Deposit) => {
+				checkAndWriteJson(deposit);
+			});
+			await Promise.all(promises);
+		} else {
+			LogWarning("No operations founded");
+		}
+	} catch (error) {
 		LogError("", error as Error);
 	}
 };
-
-//CronJobs
-cron.schedule("* * * * *", () => {
-	finalizeDeposit();
-});

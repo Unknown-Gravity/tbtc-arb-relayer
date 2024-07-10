@@ -2,6 +2,13 @@ import { Deposit } from "../../types/Deposit.type";
 import { writeJson } from "../../utils/JsonUtils";
 import { L1BitcoinDepositor } from "../Core";
 
+/**
+ * @name attemptFinalizeDeposit
+ * @description Attempts to finalize a deposit. If successful, updates the status of the deposit in the JSON storage.
+ * @param {Deposit} deposit - The deposit object to be finalized.
+ * @returns {Promise<void>} A promise that resolves when the deposit status is updated in the JSON storage.
+ */
+
 export const attempFinalizeDeposit = async (deposit: Deposit): Promise<void> => {
 	try {
 		await L1BitcoinDepositor.callStatic.finalizeDeposit(deposit.id);

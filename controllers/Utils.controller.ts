@@ -1,12 +1,6 @@
 import { Response } from "express";
 import CustomResponse from "../helpers/CustomResponse.helper";
 import { LogError } from "../utils/Logs";
-import { finalizeDeposit } from "../services/FinalizeDeposits";
-import { initializeDeposit } from "../services/InitializeDeposit";
-
-// const Response = require("../helpers/Response.helper");
-// const { finalizeDeposit } = require("../services/FinalizeDeposits.ts");
-// const { LogError } = require("../utils/Logs");
 
 export default class Utils {
 	/**
@@ -37,7 +31,7 @@ export default class Utils {
 	 * @method GET
 	 * @returns {Object} API status
 	 **/
-	pingController = async (req: Request, res: Response) => {
+	pingController = async (req: Request, res: Response): Promise<void> => {
 		const response = new CustomResponse(res);
 
 		try {
@@ -46,14 +40,5 @@ export default class Utils {
 			LogError("🚀 ~ pingController ~ err:", err as Error);
 			return response.ko((err as Error).message);
 		}
-	};
-
-	test = async (req: Request, res: Response) => {
-		const response = new CustomResponse(res);
-		try {
-			// finalizeDeposit();
-			initializeDeposit();
-			response.ok("Todo ok");
-		} catch (error) {}
 	};
 }

@@ -14,24 +14,33 @@ More info: https://www.notion.so/thresholdnetwork/L2-tBTC-SDK-Relayer-Implementa
 
 import { Deposit } from "../types/Deposit.type";
 import { getAllJsonOperationsQueued } from "../utils/JsonUtils";
+import { LogError, LogWarning } from "../utils/Logs";
 import { checkTransactionStatus } from "./InitializeDepositServices/CheckTransactionStatus";
 import { getTransactionConfirmations } from "./InitializeDepositServices/GetTransactionConfirmations";
+
+/**
+ * @name initializeDeposit
+ * @description Initialize the queued deposits
+ * @returns {Promise<void>} A promise that resolves when all deposits have been checked and their statuses have been updated.
+ */
 
 export const initializeDeposit = async (): Promise<void> => {
 	try {
 		const queued: Deposit[] = await getAllJsonOperationsQueued();
 
-		// Si es mayor que 0, hago la lógica
 		if (queued.length > 0) {
-			for (const operation of queued) {
+			const promises: Promise<void>[] = queued.map(async (operation: Deposit) => {
 				const confirmations: number = await getTransactionConfirmations(operation.txHash);
 				console.log("🚀 ~ initializeDeposit ~ confirmations:", confirmations);
 				if (confirmations > 1) {
 					await checkTransactionStatus(operation);
 				}
-			}
+			});
+			await Promise.all(promises);
+		} else {
+			LogWarning("No queued operations found");
 		}
 	} catch (error) {
-		console.log(error);
+		LogError("Error in initializeDeposit:", error as Error);
 	}
 };

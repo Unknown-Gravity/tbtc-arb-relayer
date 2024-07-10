@@ -3,6 +3,14 @@ import { Deposit } from "../../types/Deposit.type";
 import { writeJson } from "../../utils/JsonUtils";
 import { L1BitcoinDepositor, TestContract } from "../Core";
 
+/**
+ * @name checkTransactionStatus
+ * @description Checks the transaction status and updates the JSON storage accordingly.
+ * Updates the status of the deposit based on the transaction status.
+ * @param {Deposit} deposit - The deposit object to check and update.
+ * @returns {Promise<void>} A promise that resolves when the deposit status is updated in the JSON storage.
+ */
+
 export const checkTransactionStatus = async (deposit: Deposit): Promise<void> => {
 	const currentStatus = await TestContract.deposits(deposit.id);
 	console.log("🚀 ~ checkTransactionStatus ~ currentStatus:", currentStatus);

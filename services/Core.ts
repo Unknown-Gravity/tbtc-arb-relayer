@@ -2,6 +2,8 @@ import { ethers } from "ethers";
 import { L1BitcoinDepositorABI } from "../interfaces/L1BitcoinDepositor";
 import { L2BitcoinDepositorABI } from "../interfaces/L2BitcoinDepositor";
 import { TestContractABI } from "../interfaces/TestContract";
+import { finalizeDeposit } from "./FinalizeDeposits";
+import cron from "node-cron";
 // const { finalizeDeposit } = require("./FinalizeDeposits.js");
 
 // ---------------------------------------------------------------
@@ -31,10 +33,20 @@ export const L2BitcoinDepositor: ethers.Contract = new ethers.Contract(
 	providerArb
 );
 export const TestContract: ethers.Contract = new ethers.Contract(TestContract_Address, TestContractABI, providerEth);
-// Events
-// Hay que encontrar la forma de añadir un listener a L2BitcoinDepositor para el evento de initializer
-// L2BitcoinDepositor.on("DepositInitialized", (fundingTx, reveal, l2DepositOwner, l2Sender) => {
-// 	console.log("I pressed the button!!");
-// });
 
+// FundingTX will be a type
+// Reveal will be a type
+// L2DepositOwner will be a string
+// L2 Sender will be a number
+
+// Events
+L2BitcoinDepositor.on("DepositInitialized", (fundingTx, reveal, l2DepositOwner, l2Sender) => {
+	console.log("I pressed the button!!");
+});
+
+//CRONJOBS
+cron.schedule("* * * * *", () => {
+	finalizeDeposit();
+	console.log("Finalized Deposits!");
+});
 // ---------------------------------------------------------------

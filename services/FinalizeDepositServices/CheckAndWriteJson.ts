@@ -3,7 +3,14 @@ import { writeJson } from "../../utils/JsonUtils";
 import { attempFinalizeDeposit } from "./AttempFinalizeDeposit";
 import { checkFinalizeStatus } from "./CheckFinalizeStatus";
 
-export const checkAndWriteJson = async (deposit: Deposit) => {
+/**
+ * @name checkAndWriteJson
+ * @description Checks if the deposit status is "FINALIZED" and updates the JSON storage accordingly. If not, attempts to finalize the deposit.
+ * @param {Deposit} deposit - The deposit object to be checked and potentially finalized.
+ * @returns {Promise<void>} A promise that resolves when the deposit status is updated in the JSON storage.
+ */
+
+export const checkAndWriteJson = async (deposit: Deposit): Promise<void> => {
 	const status: boolean = await checkFinalizeStatus(deposit.id);
 	if (status) {
 		writeJson(
