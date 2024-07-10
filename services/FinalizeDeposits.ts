@@ -12,21 +12,23 @@ This task should:
 More info: https://www.notion.so/thresholdnetwork/L2-tBTC-SDK-Relayer-Implementation-4dfedabfcf594c7d8ef80609541cf791?pvs=4
 */
 
+import { Deposit } from "../types/Deposit.type";
+import { getAllJsonOperationsInitialized } from "../utils/JsonUtils";
+import { LogError } from "../utils/Logs";
+import { checkAndWriteJson } from "./FinalizeDepositServices/CheckAndWriteJson";
 const cron = require("node-cron");
-const { getAllJsonOperationsInitialized } = require("../utils/JsonUtils");
-const { LogError } = require("../utils/Logs");
-const { checkAndWriteJson } = require("./FinalizeDepositServices/CheckAndWriteJson");
 
-const finalizeDeposit = async () => {
+// const { LogError } = require("../utils/Logs.js");
+
+export const finalizeDeposit = async () => {
 	try {
 		const initializedDeposits = await getAllJsonOperationsInitialized();
-
-		const promises = initializedDeposits.map(async (deposit) => {
+		const promises = initializedDeposits.map(async (deposit: Deposit) => {
 			checkAndWriteJson(deposit);
 		});
 		await Promise.all(promises);
-	} catch (error) {
-		LogError(error);
+	} catch (error: unknown) {
+		LogError("", error as Error);
 	}
 };
 
@@ -34,5 +36,3 @@ const finalizeDeposit = async () => {
 cron.schedule("* * * * *", () => {
 	finalizeDeposit();
 });
-
-module.exports = { finalizeDeposit };

@@ -12,3 +12,26 @@ This task should:
 More info: https://www.notion.so/thresholdnetwork/L2-tBTC-SDK-Relayer-Implementation-4dfedabfcf594c7d8ef80609541cf791?pvs=4
 */
 
+import { Deposit } from "../types/Deposit.type";
+import { getAllJsonOperationsQueued } from "../utils/JsonUtils";
+import { checkTransactionStatus } from "./InitializeDepositServices/CheckTransactionStatus";
+import { getTransactionConfirmations } from "./InitializeDepositServices/GetTransactionConfirmations";
+
+export const initializeDeposit = async (): Promise<void> => {
+	try {
+		const queued: Deposit[] = await getAllJsonOperationsQueued();
+
+		// Si es mayor que 0, hago la lógica
+		if (queued.length > 0) {
+			for (const operation of queued) {
+				const confirmations: number = await getTransactionConfirmations(operation.txHash);
+				console.log("🚀 ~ initializeDeposit ~ confirmations:", confirmations);
+				if (confirmations > 1) {
+					await checkTransactionStatus(operation);
+				}
+			}
+		}
+	} catch (error) {
+		console.log(error);
+	}
+};

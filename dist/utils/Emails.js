@@ -1,3 +1,6 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.checkIsEmail = void 0;
 /**
     @name checkIsEmail
     @description Check if the email is valid
@@ -6,10 +9,6 @@
 **/
 const checkIsEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
     return emailRegex.test(email);
 };
-
-module.exports = {
-    checkIsEmail,
-};
+exports.checkIsEmail = checkIsEmail;

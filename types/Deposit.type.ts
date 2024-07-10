@@ -1,4 +1,4 @@
-type Deposit = {
+export type Deposit = {
 	id: string;
 	txHash: string;
 	outputIndex: number;
@@ -13,6 +13,7 @@ type Deposit = {
 	owner: string;
 	status: "QUEUED" | "INITIALIZED" | "FINALIZED" | "CANCELLED";
 	dates: {
+		createdAt: EpochTimeStamp;
 		queuedAt: EpochTimeStamp;
 		initializationAt: EpochTimeStamp;
 		finalizationAt: EpochTimeStamp;

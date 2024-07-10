@@ -1,4 +1,4 @@
-const TestContractABI = [
+export const TestContractABI = [
 	{ inputs: [], stateMutability: "nonpayable", type: "constructor" },
 	{ inputs: [{ internalType: "address", name: "target", type: "address" }], name: "AddressEmptyCode", type: "error" },
 	{
@@ -278,5 +278,3 @@ const TestContractABI = [
 		type: "function",
 	},
 ];
-
-module.exports = TestContractABI;

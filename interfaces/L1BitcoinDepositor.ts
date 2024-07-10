@@ -1,4 +1,4 @@
-const L1BitcoinDepositorABI = [
+export const L1BitcoinDepositorABI = [
 	{ inputs: [], stateMutability: "nonpayable", type: "constructor" },
 	{
 		anonymous: false,
@@ -446,5 +446,3 @@ const L1BitcoinDepositorABI = [
 		type: "function",
 	},
 ];
-
-module.exports = { L1BitcoinDepositorABI };
