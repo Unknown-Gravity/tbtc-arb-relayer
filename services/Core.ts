@@ -40,7 +40,11 @@ export const TestContract: ethers.Contract = new ethers.Contract(TestContract_Ad
 // L2 Sender will be a number
 
 // Events
-L2BitcoinDepositor.on("DepositInitialized", (fundingTx, reveal, l2DepositOwner, l2Sender) => {
+TestContract.on("DepositInitialized", (fundingTx, reveal, l2DepositOwner, l2Sender) => {
+	console.log("🚀 ~ TestContract.on ~ fundingTx:", fundingTx);
+	console.log("🚀 ~ TestContract.on ~ reveal:", reveal);
+	console.log("🚀 ~ TestContract.on ~ l2DepositOwner:", l2DepositOwner);
+	console.log("🚀 ~ TestContract.on ~ l2Sender:", l2Sender);
 	console.log("I pressed the button!!");
 });
 
