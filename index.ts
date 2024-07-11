@@ -16,6 +16,8 @@ import Routes from "./routes/Routes";
 
 // Utils
 import { LogMessage } from "./utils/Logs";
+import { startCronJobs, TestContract } from "./services/Core";
+import { initializeDeposit } from "./services/InitializeDeposit";
 
 // -------------------------------------------------------------------------
 // |                            APP CONFIG                                 |
@@ -69,4 +71,15 @@ app.use(Routes);
 app.listen(PORT, () => {
 	LogMessage(`Server running on port ${PORT}`);
 	LogMessage(`API: ${process.env.API_URL}`);
+	startCronJobs();
+
+	// Events
+	TestContract.on("DepositInitialized", (fundingTx, reveal, l2DepositOwner, l2Sender) => {
+		console.log("🚀 ~ TestContract.on ~ fundingTx:", fundingTx);
+		console.log("🚀 ~ TestContract.on ~ reveal:", reveal);
+		console.log("🚀 ~ TestContract.on ~ l2DepositOwner:", l2DepositOwner);
+		console.log("🚀 ~ TestContract.on ~ l2Sender:", l2Sender);
+		console.log("I pressed the button!!");
+		initializeDeposit(fundingTx, reveal, l2DepositOwner, l2Sender);
+	});
 });

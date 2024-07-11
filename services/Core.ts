@@ -4,8 +4,6 @@ import { L2BitcoinDepositorABI } from "../interfaces/L2BitcoinDepositor";
 import { TestContractABI } from "../interfaces/TestContract";
 import { finalizeDeposit } from "./FinalizeDeposits";
 import cron from "node-cron";
-// const { finalizeDeposit } = require("./FinalizeDeposits.js");
-
 // ---------------------------------------------------------------
 
 // Environment Variables
@@ -39,18 +37,16 @@ export const TestContract: ethers.Contract = new ethers.Contract(TestContract_Ad
 // L2DepositOwner will be a string
 // L2 Sender will be a number
 
-// Events
-TestContract.on("DepositInitialized", (fundingTx, reveal, l2DepositOwner, l2Sender) => {
-	console.log("🚀 ~ TestContract.on ~ fundingTx:", fundingTx);
-	console.log("🚀 ~ TestContract.on ~ reveal:", reveal);
-	console.log("🚀 ~ TestContract.on ~ l2DepositOwner:", l2DepositOwner);
-	console.log("🚀 ~ TestContract.on ~ l2Sender:", l2Sender);
-	console.log("I pressed the button!!");
-});
+export const startCronJobs = () => {
+	//CRONJOBS
+	console.log("Starting cron job setup...");
 
-//CRONJOBS
-cron.schedule("* * * * *", () => {
-	finalizeDeposit();
-	console.log("Finalized Deposits!");
-});
+	cron.schedule("* * * * *", () => {
+		finalizeDeposit();
+		console.log("Finalized Deposits!");
+	});
+
+	console.log("Cron job setup complete.");
+};
+
 // ---------------------------------------------------------------

@@ -17,6 +17,7 @@ import { Deposit } from "../types/Deposit.type";
 import { getAllJsonOperationsInitialized } from "../utils/JsonUtils";
 import { LogError, LogWarning } from "../utils/Logs";
 import { checkAndWriteJson } from "./FinalizeDepositServices/CheckAndWriteJson";
+import cron from "node-cron";
 
 /**
  * @name finalizeDeposit

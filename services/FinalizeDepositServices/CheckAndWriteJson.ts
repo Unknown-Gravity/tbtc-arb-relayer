@@ -1,5 +1,6 @@
 import { Deposit } from "../../types/Deposit.type";
 import { writeJson } from "../../utils/JsonUtils";
+import { LogMessage } from "../../utils/Logs";
 import { attempFinalizeDeposit } from "./AttempFinalizeDeposit";
 import { checkFinalizeStatus } from "./CheckFinalizeStatus";
 
@@ -24,6 +25,7 @@ export const checkAndWriteJson = async (deposit: Deposit): Promise<void> => {
 			},
 			deposit.id
 		);
+		LogMessage(`Deposit has been finalized | ID: ${deposit.id}`);
 	} else {
 		attempFinalizeDeposit(deposit);
 	}
