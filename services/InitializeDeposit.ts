@@ -28,27 +28,27 @@ import { getTransactionConfirmations } from "./InitializeDepositServices/GetTran
  */
 
 export const initializeDeposit = async (
-	fundingTx: FundingTx,
-	reveal: string,
+	fundingTx: string[],
+	reveal: (string | number)[],
 	l2DepositOwner: string,
-	l2Sender: L2Sender
+	l2Sender: string
 ): Promise<void> => {
 	try {
 		const depositData: DepositQueuedData = {
-			fundingTx: fundingTx,
-			reveal: reveal,
-			l2DepositOwner: l2DepositOwner,
-			l2Sender: l2Sender,
+			fundingTx,
+			reveal,
+			l2DepositOwner,
+			l2Sender,
 		};
 		const queued: Deposit[] = await getAllJsonOperationsQueued();
 
 		if (queued.length > 0) {
 			const promises: Promise<void>[] = queued.map(async (operation: Deposit) => {
-				const confirmations: number = await getTransactionConfirmations(operation.txHash);
-				console.log("🚀 ~ initializeDeposit ~ confirmations:", confirmations);
-				if (confirmations > 1) {
-					await checkTransactionStatus(operation, depositData);
-				}
+				// const confirmations: number = await getTransactionConfirmations(operation.txHash);
+				// console.log("🚀 ~ initializeDeposit ~ confirmations:", confirmations);
+				// if (confirmations > 1) {
+				await checkTransactionStatus(operation, depositData);
+				// }
 			});
 			await Promise.all(promises);
 		} else {

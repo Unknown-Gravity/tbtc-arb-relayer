@@ -1,4 +1,6 @@
 import { Deposit } from "../types/Deposit.type";
+import { getStringDate } from "./Dates";
+import { getTransactionHash } from "./GetTransactionHash";
 import { LogError } from "./Logs";
 
 const fs = require("fs");
@@ -147,6 +149,29 @@ const writeJson = (data: Deposit, operationId: string): boolean => {
 		LogError("🚀 ~ writeJson ~ error:", error as Error);
 		return false;
 	}
+};
+
+export const writeNewJson = (fundingTx: any, reveal: any, l2DepositOwner: any, l2Sender: any) => {
+	const deposit: Deposit = {
+		id: reveal[1],
+		txHash: getTransactionHash(fundingTx),
+		outputIndex: reveal[0],
+		receipt: {
+			depositor: l2Sender,
+			blindingFactor: reveal[1],
+			walletPublicKeyHash: reveal[2],
+			refundPublicKeyHash: reveal[3],
+			refundLocktime: reveal[4],
+			extraData: reveal[5],
+		},
+		owner: l2DepositOwner,
+		status: "QUEUED",
+		dates: {
+			createdAt: new Date().getTime(),
+		},
+	};
+
+	writeJson(deposit, deposit.txHash);
 };
 
 /**

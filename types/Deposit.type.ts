@@ -11,12 +11,12 @@ export type Deposit = {
 		extraData: string;
 	};
 	owner: string;
-	status: "QUEUED" | "INITIALIZED" | "FINALIZED" | "CANCELLED";
+	status: "QUEUED" | "INITIALIZED" | "FINALIZED" | "CANCELLED" | "UNKNOWN";
 	dates: {
-		createdAt: EpochTimeStamp;
-		queuedAt: EpochTimeStamp;
-		initializationAt: EpochTimeStamp;
-		finalizationAt: EpochTimeStamp;
-		cancellationAt: EpochTimeStamp;
+		createdAt?: EpochTimeStamp;
+		queuedAt?: EpochTimeStamp;
+		initializationAt?: EpochTimeStamp;
+		finalizationAt?: EpochTimeStamp;
+		cancellationAt?: EpochTimeStamp;
 	};
 };

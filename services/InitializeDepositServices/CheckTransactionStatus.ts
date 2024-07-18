@@ -1,8 +1,8 @@
-import { CANCELLED } from "dns";
 import { Deposit } from "../../types/Deposit.type";
 import { writeJson } from "../../utils/JsonUtils";
-import { L1BitcoinDepositor, TestContract } from "../Core";
+import { L1BitcoinDepositor } from "../Core";
 import { DepositQueuedData } from "../../types/DepositQueuedData";
+import { LogError } from "../../utils/Logs";
 
 /**
  * @name checkTransactionStatus
@@ -13,29 +13,55 @@ import { DepositQueuedData } from "../../types/DepositQueuedData";
  */
 
 export const checkTransactionStatus = async (deposit: Deposit, depositData: DepositQueuedData): Promise<void> => {
-	const currentStatus = await TestContract.deposits(deposit.id);
+	const currentStatus = await L1BitcoinDepositor.deposits(deposit.id);
 	console.log("🚀 ~ checkTransactionStatus ~ currentStatus:", currentStatus);
 
 	try {
 		if (currentStatus === 1) {
-			writeJson({ ...deposit, status: "INITIALIZED" }, deposit.id);
+			writeJson(
+				{
+					...deposit,
+					status: "INITIALIZED",
+					dates: { ...deposit.dates, initializationAt: new Date().getTime() },
+				},
+				deposit.id
+			);
 		} else if (currentStatus === 2) {
-			writeJson({ ...deposit, status: "FINALIZED" }, deposit.id);
-		} else if (currentStatus !== 0) {
-			4;
-			// 	🚀 ~ TestContract.on ~ fundingTx: BigNumber {
-			// 	_hex: '0x73c8c46e2b758b48e8ea9001b4f74aa656ed7de930e32ba7c3b74156d11dc459',
-			// 	_isBigNumber: true
-			//   }
-			//   🚀 ~ TestContract.on ~ reveal: 0x27224cE5adAC2bc57b8D257c13C5FE869A6Bb005
-			//   🚀 ~ TestContract.on ~ l2DepositOwner: 0x0483cD12aC9758e530dc184a1b542439BA6cDB8f
-			//   🚀 ~ TestContract.on ~ l2Sender: BigNumber { _hex: '0x4768d7effc4000', _isBigNumber: true }
-
-			//Here we have to obtain trough a service, the objects fundingTx, reveal and l2DepositOwner to initialize the deposit
-			L1BitcoinDepositor.initializeDeposit(depositData.fundingTx, depositData.reveal, depositData.l2DepositOwner);
-			writeJson({ ...deposit, status: "FINALIZED" }, deposit.txHash);
+			writeJson(
+				{
+					...deposit,
+					status: "INITIALIZED",
+					dates: { ...deposit.dates, initializationAt: new Date().getTime() },
+				},
+				deposit.id
+			);
+		} else if (currentStatus === 0) {
+			const fundingTx: any = {
+				version: depositData.fundingTx[0],
+				inputVector: depositData.fundingTx[1],
+				outputVector: depositData.fundingTx[2],
+				locktime: depositData.fundingTx[3],
+			};
+			const reveal: any = {
+				fundingOutputIndex: depositData.reveal[0],
+				blindingFactor: depositData.reveal[1],
+				walletPubKeyHash: depositData.reveal[2],
+				refundPubKeyHash: depositData.reveal[3],
+				refundLocktime: depositData.reveal[4],
+				vault: depositData.reveal[5],
+			};
+			const tx = await L1BitcoinDepositor.initializeDeposit(fundingTx, reveal, depositData.l2DepositOwner);
+			console.log("🚀 ~ checkTransactionStatus ~ tx:", tx);
+			writeJson(
+				{
+					...deposit,
+					status: "INITIALIZED",
+					dates: { ...deposit.dates, initializationAt: new Date().getTime() },
+				},
+				deposit.txHash
+			);
 		}
 	} catch (error) {
-		console.error(`Error initializing deposit for txHash ${deposit.txHash}:`, error);
+		LogError(`Error initializing deposit for txHash ${deposit.txHash}:`, error as Error);
 	}
 };

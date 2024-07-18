@@ -15,4 +15,6 @@ router.get("/status", utils.pingController);
 // Diagnostic route for the API
 router.get("/diagnostic", operations.getAllOperations);
 
+router.get("/test", utils.test);
+
 export default router;
