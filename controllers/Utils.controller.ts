@@ -1,8 +1,7 @@
 import { Response } from "express";
 import CustomResponse from "../helpers/CustomResponse.helper";
 import { LogError } from "../utils/Logs";
-import { getTransactionHash } from "../utils/GetTransactionHash";
-import { initializeDeposit } from "../services/InitializeDeposit";
+import { initializeDepositsL1 } from "../services/InitializeDepositServices/InitializeDepositsL1";
 
 export default class Utils {
 	/**
@@ -66,6 +65,6 @@ export default class Utils {
 			"0x81c62b00",
 		];
 
-		initializeDeposit(fundingTx, reveal, l2DepositOwner, l2Sender);
+		initializeDepositsL1();
 	};
 }

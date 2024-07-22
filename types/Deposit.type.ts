@@ -12,6 +12,12 @@ export type Deposit = {
 	};
 	owner: string;
 	status: "QUEUED" | "INITIALIZED" | "FINALIZED" | "CANCELLED" | "UNKNOWN";
+	L1OutputEvent: {
+		fundingTx: JSON;
+		reveal: JSON;
+		l2DepositOwner: any;
+		l2Sender: any;
+	};
 	dates: {
 		createdAt?: EpochTimeStamp;
 		queuedAt?: EpochTimeStamp;

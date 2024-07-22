@@ -27,7 +27,7 @@ export const initiateCrossChainDeposit = async () => {
 
 	await sdk.initializeCrossChain("Arbitrum", arbitrumSigner);
 
-	const bitcoinRecoveryAddress: string = "tb1q7wdyvgxy38t6zfex5ucgaqprpsj807zz5rr4kk";
+	const bitcoinRecoveryAddress: string = "tb1qqmt9jajvkuhjhxhen686p9jzppsh650enk64j9";
 
 	const deposit = await sdk.deposits.initiateCrossChainDeposit(bitcoinRecoveryAddress, "Arbitrum");
 	console.log("🚀 ~ initiateCrossChainDeposit ~ deposit:", deposit);

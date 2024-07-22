@@ -65,6 +65,11 @@ const checkIfExistJson = (operationId: string): boolean => {
  */
 const getAllJsonOperations = async (): Promise<Array<Deposit>> => {
 	const dirPath = path.resolve(".", JSON_DIR);
+
+	if (!fs.existsSync(dirPath)) {
+		fs.mkdirSync(dirPath);
+	}
+
 	const files = await fs.promises.readdir(dirPath);
 	const jsonFiles = files.filter((file: JSON) => path.extname(file) === ".json");
 
@@ -164,12 +169,19 @@ export const writeNewJson = (fundingTx: any, reveal: any, l2DepositOwner: any, l
 			refundLocktime: reveal[4],
 			extraData: reveal[5],
 		},
+		L1OutputEvent: {
+			fundingTx: fundingTx,
+			reveal: reveal,
+			l2DepositOwner: l2DepositOwner,
+			l2Sender: l2Sender,
+		},
 		owner: l2DepositOwner,
 		status: "QUEUED",
 		dates: {
 			createdAt: new Date().getTime(),
 		},
 	};
+	console.log("🚀 ~ writeNewJson ~ deposit:", deposit);
 
 	writeJson(deposit, deposit.txHash);
 };

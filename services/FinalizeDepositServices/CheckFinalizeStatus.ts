@@ -1,4 +1,4 @@
-import { TestContract } from "../Core";
+import { L1BitcoinDepositor } from "../Core";
 
 /**
  * @name checkFinalizeStatus
@@ -8,6 +8,6 @@ import { TestContract } from "../Core";
  */
 
 export const checkFinalizeStatus = async (operationId: string): Promise<boolean> => {
-	const status: number = await TestContract.deposits(operationId);
+	const status: number = await L1BitcoinDepositor.deposits(operationId);
 	return status === 2;
 };

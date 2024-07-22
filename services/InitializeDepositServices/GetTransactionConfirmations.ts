@@ -9,8 +9,9 @@ import axios, { AxiosResponse } from "axios";
 
 export const getTransactionConfirmations = async (txHash: string): Promise<number> => {
 	try {
-		const apiURL: string = process.env.ALTER_API_URL || "";
+		const apiURL: string = process.env.TESTNET_BTC_API_URL || "";
 		const response: AxiosResponse = await axios.get(`${apiURL}${txHash}`);
+		console.log("🚀 ~ getTransactionConfirmations ~ response:", response);
 		return response.data.confirmations;
 	} catch (error) {
 		console.error(`Error fetching confirmations for txid ${txHash}:`, error);

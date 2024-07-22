@@ -16,10 +16,8 @@ import Routes from "./routes/Routes";
 
 // Utils
 import { LogMessage } from "./utils/Logs";
-import { checkEvents, L2BitcoinDepositor, startCronJobs, TestContract } from "./services/Core";
-import { initializeDeposit } from "./services/InitializeDeposit";
-import { writeJson, writeNewJson } from "./utils/JsonUtils";
-import { getTransactionHash } from "./utils/GetTransactionHash";
+import { checkEvents, L2BitcoinDepositor, startCronJobs } from "./services/Core";
+import { initializeDepositsL1 } from "./services/InitializeDepositServices/InitializeDepositsL1";
 
 // -------------------------------------------------------------------------
 // |                            APP CONFIG                                 |
@@ -74,7 +72,8 @@ app.listen(PORT, () => {
 	LogMessage(`Server running on port ${PORT}`);
 	LogMessage(`API: ${process.env.API_URL}`);
 	//CronJobs
-	startCronJobs();
+	// startCronJobs();
 	// Events
 	checkEvents();
+	initializeDepositsL1();
 });
