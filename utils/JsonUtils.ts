@@ -1,6 +1,8 @@
 import { Deposit } from "../types/Deposit.type";
+import { FundingTransaction } from "../types/FundingTransaction.type";
 import { getStringDate } from "./Dates";
-import { getTransactionHash } from "./GetTransactionHash";
+import { getDepositId } from "./GetDepositId";
+import { getFundingTxHash, getTransactionHash } from "./GetTransactionHash";
 import { LogError } from "./Logs";
 
 const fs = require("fs");
@@ -156,10 +158,13 @@ const writeJson = (data: Deposit, operationId: string): boolean => {
 	}
 };
 
-export const writeNewJson = (fundingTx: any, reveal: any, l2DepositOwner: any, l2Sender: any) => {
+export const writeNewJson = (fundingTx: FundingTransaction, reveal: any, l2DepositOwner: any, l2Sender: any) => {
+	const fundingTxHash = getFundingTxHash(fundingTx);
+	const depositId = getDepositId(fundingTxHash, reveal[0]);
 	const deposit: Deposit = {
-		id: reveal[1],
+		id: depositId,
 		txHash: getTransactionHash(fundingTx),
+		fundingTxHash: fundingTxHash,
 		outputIndex: reveal[0],
 		receipt: {
 			depositor: l2Sender,
@@ -170,7 +175,12 @@ export const writeNewJson = (fundingTx: any, reveal: any, l2DepositOwner: any, l
 			extraData: reveal[5],
 		},
 		L1OutputEvent: {
-			fundingTx: fundingTx,
+			fundingTx: {
+				version: fundingTx.version,
+				inputVector: fundingTx.inputVector,
+				outputVector: fundingTx.outputVector,
+				locktime: fundingTx.locktime,
+			},
 			reveal: reveal,
 			l2DepositOwner: l2DepositOwner,
 			l2Sender: l2Sender,
@@ -181,7 +191,6 @@ export const writeNewJson = (fundingTx: any, reveal: any, l2DepositOwner: any, l
 			createdAt: new Date().getTime(),
 		},
 	};
-	console.log("🚀 ~ writeNewJson ~ deposit:", deposit);
 
 	writeJson(deposit, deposit.txHash);
 };

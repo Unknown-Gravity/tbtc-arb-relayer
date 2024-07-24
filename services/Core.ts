@@ -55,7 +55,7 @@ export const checkEvents = () => {
 	L2BitcoinDepositor.on("DepositInitialized", (fundingTx, reveal, l2DepositOwner, l2Sender) => {
 		console.log("🚀 ~ L2BitcoinDepositor.on ~ fundingTx:", fundingTx);
 		writeNewJson(fundingTx, reveal, l2DepositOwner, l2Sender);
-		initializeDepositsL1();
+		// initializeDepositsL1();
 	});
 };
 

@@ -1,6 +1,10 @@
+import { FundingTransaction } from "./FundingTransaction.type";
+import { Reveal } from "./Reveal.type";
+
 export type Deposit = {
 	id: string;
 	txHash: string;
+	fundingTxHash: string;
 	outputIndex: number;
 	receipt: {
 		depositor: string;
@@ -13,8 +17,8 @@ export type Deposit = {
 	owner: string;
 	status: "QUEUED" | "INITIALIZED" | "FINALIZED" | "CANCELLED" | "UNKNOWN";
 	L1OutputEvent: {
-		fundingTx: JSON;
-		reveal: JSON;
+		fundingTx: FundingTransaction;
+		reveal: Reveal;
 		l2DepositOwner: any;
 		l2Sender: any;
 	};

@@ -13,6 +13,8 @@ function hexToBuffer(hex: string): Buffer {
 
 function serializeTransaction(fundingTx: FundingTransaction): Buffer {
 	const { version, inputVector, outputVector, locktime } = fundingTx;
+	console.log("🚀 ~ serializeTransaction ~ inputVector:", inputVector);
+	console.log("🚀 ~ serializeTransaction ~ version:", version);
 
 	// Convert hex strings to buffers
 	const versionBuffer = hexToBuffer(version);
@@ -35,4 +37,10 @@ export function getTransactionHash(fundingTx: FundingTransaction): string {
 	const serializedTx = serializeTransaction(fundingTx);
 	const hash = doubleSha256(serializedTx);
 	return hash.reverse().toString("hex");
+}
+
+export function getFundingTxHash(fundingTx: FundingTransaction): string {
+	const serializedTx = serializeTransaction(fundingTx);
+	const hash = doubleSha256(serializedTx);
+	return hash.toString("hex");
 }
