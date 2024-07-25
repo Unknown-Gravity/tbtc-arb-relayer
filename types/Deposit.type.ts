@@ -3,9 +3,17 @@ import { Reveal } from "./Reveal.type";
 
 export type Deposit = {
 	id: string;
-	txHash: string;
 	fundingTxHash: string;
 	outputIndex: number;
+	hashes: {
+		btc: {
+			btcTxHash: string;
+		};
+		eth: {
+			initializeTxHash: string | null;
+			finalizeTxHash: string | null;
+		};
+	};
 	receipt: {
 		depositor: string;
 		blindingFactor: string;
@@ -15,7 +23,7 @@ export type Deposit = {
 		extraData: string;
 	};
 	owner: string;
-	status: "QUEUED" | "INITIALIZED" | "FINALIZED" | "CANCELLED" | "UNKNOWN";
+	status: "QUEUED" | "INITIALIZED" | "FINALIZED";
 	L1OutputEvent: {
 		fundingTx: FundingTransaction;
 		reveal: Reveal;
@@ -23,10 +31,9 @@ export type Deposit = {
 		l2Sender: any;
 	};
 	dates: {
-		createdAt?: EpochTimeStamp;
-		queuedAt?: EpochTimeStamp;
-		initializationAt?: EpochTimeStamp;
-		finalizationAt?: EpochTimeStamp;
-		cancellationAt?: EpochTimeStamp;
+		createdAt: EpochTimeStamp | null;
+
+		initializationAt: EpochTimeStamp | null;
+		finalizationAt: EpochTimeStamp | null;
 	};
 };

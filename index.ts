@@ -71,9 +71,8 @@ app.use(Routes);
 app.listen(PORT, () => {
 	LogMessage(`Server running on port ${PORT}`);
 	LogMessage(`API: ${process.env.API_URL}`);
-	//CronJobs
-	// startCronJobs();
 	// Events
 	checkEvents();
-	// initializeDepositsL1();
+	//CronJobs
+	// startCronJobs();
 });

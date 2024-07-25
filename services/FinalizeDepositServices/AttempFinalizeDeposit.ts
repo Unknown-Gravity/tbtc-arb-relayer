@@ -1,6 +1,6 @@
 import { Deposit } from "../../types/Deposit.type";
 import { writeJson } from "../../utils/JsonUtils";
-import { LogMessage } from "../../utils/Logs";
+import { LogError, LogMessage } from "../../utils/Logs";
 import { L1BitcoinDepositor } from "../Core";
 
 /**
@@ -12,13 +12,23 @@ import { L1BitcoinDepositor } from "../Core";
 
 export const attempFinalizeDeposit = async (deposit: Deposit): Promise<void> => {
 	try {
+		const value = (await L1BitcoinDepositor.quoteFinalizeDeposit()).toString();
+		console.log("🚀 ~ attempFinalizeDeposit ~ value:", value.toString());
 		LogMessage(`Trying to finalized deposit with id: ${deposit.id}`);
-		await L1BitcoinDepositor.callStatic.finalizeDeposit(deposit.id);
-		const dep = L1BitcoinDepositor.finalizeDeposit(deposit.id);
-		dep.wait();
-		writeJson({ ...deposit, status: "FINALIZED" }, deposit.id);
+		await L1BitcoinDepositor.callStatic.finalizeDeposit(deposit.id, { value: value });
+		const dep = await L1BitcoinDepositor.finalizeDeposit(deposit.id, { value: value });
+		await dep.wait();
+		writeJson(
+			{
+				...deposit,
+				status: "FINALIZED",
+				dates: { ...deposit.dates, finalizationAt: new Date().getTime() },
+				hashes: { ...deposit.hashes, eth: { ...deposit.hashes.eth, finalizeTxHash: dep.hash } },
+			},
+			deposit.id
+		);
 		LogMessage(`Deposit has been finalized | Id: ${deposit.id}`);
 	} catch (error) {
-		console.log("Desposit cant' be finalized", error);
+		LogError("Desposit cant' be finalized", error as Error);
 	}
 };

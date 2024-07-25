@@ -1,13 +1,3 @@
-/*
-The goal of this task is cleaning up trash deposits and preventing relayer’s congestion.
-
-This task should:
-- Delete (remove from persistent storage) QUEUED deposits that have been in that state for more than 48 hours.
-- Delete (remove from persistent storage) any deposits that are in the FINALIZED state for more than 12 hours.
-
-More info: https://www.notion.so/thresholdnetwork/L2-tBTC-SDK-Relayer-Implementation-4dfedabfcf594c7d8ef80609541cf791?pvs=4
-*/
-
 import { Deposit } from "../types/Deposit.type";
 import { getAllJsonOperationsFinalized, getAllJsonOperationsQueued } from "../utils/JsonUtils";
 import { LogMessage } from "../utils/Logs";
@@ -28,8 +18,10 @@ export const cleanQueuedDeposits = async (): Promise<void> => {
 
 	// Filter the deposits that have been in the QUEUED state for more than 48 hours
 	const depositsToDelete: Deposit[] = operations.filter((operation) => {
-		const operationTimestamp: EpochTimeStamp = new Date(operation.dates.queuedAt).getTime();
-		return currentTime - operationTimestamp > olderThan48Hours;
+		const createdAt: number | null = operation.dates.createdAt
+			? new Date(operation.dates.createdAt).getTime()
+			: null;
+		return createdAt !== null && currentTime - createdAt > olderThan48Hours;
 	});
 
 	// Delete the deposits
@@ -37,7 +29,9 @@ export const cleanQueuedDeposits = async (): Promise<void> => {
 		LogMessage(
 			`Deleting QUEUED deposit with ID ${deposit.id} | Actual: ${currentTime} | Creation: ${
 				deposit.dates.createdAt
-			} | Difference: ${currentTime - deposit.dates.createdAt}`
+			} | Difference: ${
+				currentTime - (deposit.dates.createdAt ? new Date(deposit.dates.createdAt).getTime() : 0)
+			}`
 		);
 		// deleteJson(deposit.id);
 	});
@@ -58,8 +52,10 @@ export const cleanFinalizedDeposits = async () => {
 
 	// Filter the deposits that have been in the FINALIZED state for more than 12 hours
 	const depositsToDelete: Deposit[] = operations.filter((operation) => {
-		const operationTimestamp: EpochTimeStamp = new Date(operation.dates.finalizationAt).getTime();
-		return currentTime - operationTimestamp > olderThan12Hours;
+		const finalizationAt: number | null = operation.dates.finalizationAt
+			? new Date(operation.dates.finalizationAt).getTime()
+			: null;
+		return finalizationAt !== null && currentTime - finalizationAt > olderThan12Hours;
 	});
 
 	// Delete the deposits
@@ -67,7 +63,9 @@ export const cleanFinalizedDeposits = async () => {
 		LogMessage(
 			`Deleting FINALIZED deposit with ID ${deposit.id} | Actual: ${currentTime} | Creation: ${
 				deposit.dates.createdAt
-			} | Difference: ${currentTime - deposit.dates.createdAt}`
+			} | Difference: ${
+				currentTime - (deposit.dates.createdAt ? new Date(deposit.dates.createdAt).getTime() : 0)
+			}`
 		);
 		// deleteJson(deposit.id);
 	});

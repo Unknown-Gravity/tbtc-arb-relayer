@@ -20,7 +20,7 @@ export const checkAndWriteJson = async (deposit: Deposit): Promise<void> => {
 				status: "FINALIZED",
 				dates: {
 					...deposit.dates,
-					finalizationAt: new Date()[Symbol.toPrimitive]("number"),
+					finalizationAt: new Date().getTime(),
 				},
 			},
 			deposit.id

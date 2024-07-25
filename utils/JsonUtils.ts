@@ -1,5 +1,6 @@
 import { Deposit } from "../types/Deposit.type";
 import { FundingTransaction } from "../types/FundingTransaction.type";
+import { createDeposit } from "./CreateDeposit";
 import { getStringDate } from "./Dates";
 import { getDepositId } from "./GetDepositId";
 import { getFundingTxHash, getTransactionHash } from "./GetTransactionHash";
@@ -158,41 +159,18 @@ const writeJson = (data: Deposit, operationId: string): boolean => {
 	}
 };
 
-export const writeNewJson = (fundingTx: FundingTransaction, reveal: any, l2DepositOwner: any, l2Sender: any) => {
-	const fundingTxHash = getFundingTxHash(fundingTx);
-	const depositId = getDepositId(fundingTxHash, reveal[0]);
-	const deposit: Deposit = {
-		id: depositId,
-		txHash: getTransactionHash(fundingTx),
-		fundingTxHash: fundingTxHash,
-		outputIndex: reveal[0],
-		receipt: {
-			depositor: l2Sender,
-			blindingFactor: reveal[1],
-			walletPublicKeyHash: reveal[2],
-			refundPublicKeyHash: reveal[3],
-			refundLocktime: reveal[4],
-			extraData: reveal[5],
-		},
-		L1OutputEvent: {
-			fundingTx: {
-				version: fundingTx.version,
-				inputVector: fundingTx.inputVector,
-				outputVector: fundingTx.outputVector,
-				locktime: fundingTx.locktime,
-			},
-			reveal: reveal,
-			l2DepositOwner: l2DepositOwner,
-			l2Sender: l2Sender,
-		},
-		owner: l2DepositOwner,
-		status: "QUEUED",
-		dates: {
-			createdAt: new Date().getTime(),
-		},
-	};
+/**
+ * Create a new deposit and write it to a JSON file.
+ * @param {FundingTransaction} fundingTx - The Bitcoin funding transaction.
+ * @param {any} reveal - An array containing reveal parameters related to the Bitcoin deposit.
+ * @param {any} l2DepositOwner - The owner of the deposit on the L2 network.
+ * @param {any} l2Sender - The sender address on the L2 network.
+ */
 
-	writeJson(deposit, deposit.txHash);
+export const writeNewJson = (fundingTx: FundingTransaction, reveal: any, l2DepositOwner: any, l2Sender: any) => {
+	const deposit: Deposit = createDeposit(fundingTx, reveal, l2DepositOwner, l2Sender);
+
+	writeJson(deposit, deposit.id);
 };
 
 /**

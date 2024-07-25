@@ -1,5 +1,3 @@
-import { escape } from "querystring";
-
 /**
  * @name formatNumber
  * @description Format a number to have two digits

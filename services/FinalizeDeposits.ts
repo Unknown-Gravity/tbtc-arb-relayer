@@ -12,12 +12,10 @@ This task should:
 More info: https://www.notion.so/thresholdnetwork/L2-tBTC-SDK-Relayer-Implementation-4dfedabfcf594c7d8ef80609541cf791?pvs=4
 */
 
-import { Deserializer } from "v8";
 import { Deposit } from "../types/Deposit.type";
 import { getAllJsonOperationsInitialized } from "../utils/JsonUtils";
 import { LogError, LogWarning } from "../utils/Logs";
 import { checkAndWriteJson } from "./FinalizeDepositServices/CheckAndWriteJson";
-import cron from "node-cron";
 
 /**
  * @name finalizeDeposit

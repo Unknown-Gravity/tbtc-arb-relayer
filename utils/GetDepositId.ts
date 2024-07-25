@@ -1,5 +1,17 @@
 import { ethers } from "ethers";
-import EthCrypto from "eth-crypto";
+
+/**
+ * @name getDepositId
+ * @description Generates a unique deposit ID by encoding the Bitcoin funding transaction hash and output index,
+ * then hashing the result using keccak256.
+ *
+ * @param {string} fundingTxHash - The 64-character hex string of the Bitcoin funding transaction hash.
+ * @param {number} fundingOutputIndex - The index of the output in the funding transaction.
+ *
+ * @returns {string} A unique deposit ID as a uint256 string.
+ *
+ * @throws {Error} If the fundingTxHash is not a 64-character string.
+ */
 
 export const getDepositId = (fundingTxHash: string, fundingOutputIndex: number): string => {
 	// Asegúrate de que fundingTxHash es una cadena de 64 caracteres hexadecimales

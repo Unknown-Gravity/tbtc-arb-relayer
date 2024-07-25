@@ -1,9 +1,7 @@
 import { Deposit } from "../../types/Deposit.type";
 import { writeJson } from "../../utils/JsonUtils";
 import { L1BitcoinDepositor } from "../Core";
-import { DepositQueuedData } from "../../types/DepositQueuedData";
 import { LogError } from "../../utils/Logs";
-import { ethers } from "ethers";
 
 /**
  * @name InitializeDepositL1
@@ -13,23 +11,9 @@ import { ethers } from "ethers";
  */
 export const initializeDepositL1 = async (deposit: Deposit): Promise<void> => {
 	try {
-		// const fundingTx: any = {
-		// 	version: depositData.fundingTx[0],
-		// 	inputVector: depositData.fundingTx[1],
-		// 	outputVector: depositData.fundingTx[2],
-		// 	locktime: depositData.fundingTx[3],
-		// };
-		// const reveal: any = {
-		// 	fundingOutputIndex: depositData.reveal[0],
-		// 	blindingFactor: depositData.reveal[1],
-		// 	walletPubKeyHash: depositData.reveal[2],
-		// 	refundPubKeyHash: depositData.reveal[3],
-		// 	refundLocktime: depositData.reveal[4],
-		// 	vault: depositData.reveal[5],
-		// };
-
 		const fundingTx: any = deposit.L1OutputEvent.fundingTx;
 		const reveal: any = deposit.L1OutputEvent.reveal;
+		await L1BitcoinDepositor.callStatic.initializeDeposit(fundingTx, reveal, deposit.L1OutputEvent.l2DepositOwner);
 		const tx = await L1BitcoinDepositor.initializeDeposit(fundingTx, reveal, deposit.L1OutputEvent.l2DepositOwner);
 		await tx.wait();
 		console.log("🚀 ~ checkTransactionStatus ~ tx:", tx);
@@ -38,10 +22,11 @@ export const initializeDepositL1 = async (deposit: Deposit): Promise<void> => {
 				...deposit,
 				status: "INITIALIZED",
 				dates: { ...deposit.dates, initializationAt: new Date().getTime() },
+				hashes: { ...deposit.hashes, eth: { ...deposit.hashes.eth, initializeTxHash: tx.hash } },
 			},
-			deposit.txHash
+			deposit.id
 		);
 	} catch (error) {
-		LogError(`Error initializing deposit for txHash ${deposit.txHash}:`, error as Error);
+		LogError(`Error initializing deposit for txHash ${deposit.hashes.btc.btcTxHash}:`, error as Error);
 	}
 };
