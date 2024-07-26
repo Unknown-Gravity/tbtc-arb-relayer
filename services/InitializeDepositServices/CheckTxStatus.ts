@@ -8,7 +8,6 @@ import { L1BitcoinDepositor } from "../Core";
  * @param {Deposit} deposit - The deposit we want to check the status
  * @returns {Promise<number>} A promise that resolves when the deposit status is updated in the JSON storage.
  */
-
 export const checkTxStatus = async (deposit: Deposit): Promise<number> => {
 	try {
 		const currentStatus = await L1BitcoinDepositor.deposits(deposit.id);

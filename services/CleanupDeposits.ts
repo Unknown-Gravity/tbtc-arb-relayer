@@ -16,7 +16,7 @@ export const cleanQueuedDeposits = async (): Promise<void> => {
 
 	if (operations.length > 0) {
 		// Get the current timestamp
-		const currentTime: EpochTimeStamp = new Date().getTime();
+		const currentTime: EpochTimeStamp = Date.now();
 
 		// Filter the deposits that have been in the QUEUED state for more than 48 hours
 		const depositsToDelete: Deposit[] = operations.filter((operation) => {

@@ -1,6 +1,7 @@
 import { Deposit } from "../../types/Deposit.type";
 import { writeJson } from "../../utils/JsonUtils";
-import { LogMessage } from "../../utils/Logs";
+import { LogMessage, LogError } from "../../utils/Logs";
+import { sdk } from "../initializeSDK";
 import { attempFinalizeDeposit } from "./AttempFinalizeDeposit";
 import { checkFinalizeStatus } from "./CheckFinalizeStatus";
 
@@ -10,23 +11,22 @@ import { checkFinalizeStatus } from "./CheckFinalizeStatus";
  * @param {Deposit} deposit - The deposit object to be checked and potentially finalized.
  * @returns {Promise<void>} A promise that resolves when the deposit status is updated in the JSON storage.
  */
-
 export const checkAndWriteJson = async (deposit: Deposit): Promise<void> => {
-	const status: boolean = await checkFinalizeStatus(deposit.id);
-	if (status) {
-		writeJson(
-			{
+	try {
+		const status = await checkFinalizeStatus(deposit.id);
+		if (status) {
+			const updatedDeposit: Deposit = {
 				...deposit,
 				status: "FINALIZED",
-				dates: {
-					...deposit.dates,
-					finalizationAt: new Date().getTime(),
-				},
-			},
-			deposit.id
-		);
-		LogMessage(`Deposit has been finalized | ID: ${deposit.id}`);
-	} else {
-		attempFinalizeDeposit(deposit);
+				dates: { ...deposit.dates, finalizationAt: Date.now() },
+			};
+
+			await writeJson(updatedDeposit, deposit.id);
+			LogMessage(`Deposit has been finalized | ID: ${deposit.id}`);
+		} else {
+			await attempFinalizeDeposit(deposit);
+		}
+	} catch (error) {
+		LogError("Error in checkAndWriteJson", error as Error);
 	}
 };

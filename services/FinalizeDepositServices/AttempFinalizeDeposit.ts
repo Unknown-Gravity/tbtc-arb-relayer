@@ -18,15 +18,15 @@ export const attempFinalizeDeposit = async (deposit: Deposit): Promise<void> => 
 		await L1BitcoinDepositor.callStatic.finalizeDeposit(deposit.id, { value: value });
 		const dep = await L1BitcoinDepositor.finalizeDeposit(deposit.id, { value: value });
 		await dep.wait();
-		writeJson(
-			{
-				...deposit,
-				status: "FINALIZED",
-				dates: { ...deposit.dates, finalizationAt: new Date().getTime() },
-				hashes: { ...deposit.hashes, eth: { ...deposit.hashes.eth, finalizeTxHash: dep.hash } },
-			},
-			deposit.id
-		);
+
+		const updatedDeposit: Deposit = {
+			...deposit,
+			status: "FINALIZED",
+			dates: { ...deposit.dates, finalizationAt: Date.now() },
+			hashes: { ...deposit.hashes, eth: { ...deposit.hashes.eth, finalizeTxHash: dep.hash } },
+		};
+
+		writeJson(updatedDeposit, deposit.id);
 		LogMessage(`Deposit has been finalized | Id: ${deposit.id}`);
 	} catch (error) {
 		LogError("Desposit cant' be finalized", error as Error);
