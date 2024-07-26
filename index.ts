@@ -74,5 +74,5 @@ app.listen(PORT, () => {
 	// Events
 	checkEvents();
 	//CronJobs
-	// startCronJobs();
+	startCronJobs();
 });

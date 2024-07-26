@@ -1,7 +1,6 @@
 import { BigNumber, ethers } from "ethers";
 import { L1BitcoinDepositorABI } from "../interfaces/L1BitcoinDepositor";
 import { L2BitcoinDepositorABI } from "../interfaces/L2BitcoinDepositor";
-import { finalizeDeposit } from "./FinalizeDeposits";
 import cron from "node-cron";
 import { TBTC } from "@keep-network/tbtc-v2.ts";
 import { getAllJsonOperationsQueued, getJsonById, writeNewJson } from "../utils/JsonUtils";
@@ -12,6 +11,8 @@ import { initializeDepositsL1 } from "./InitializeDepositServices/InitializeDepo
 import { LogMessage } from "../utils/Logs";
 import { TBTCVaultABI } from "../interfaces/TBTCVaultSepolia";
 import { attempFinalizeDeposit } from "./FinalizeDepositServices/AttempFinalizeDeposit";
+import { cleanFinalizedDeposits, cleanQueuedDeposits } from "./CleanupDeposits";
+import { finalizeDeposit } from "./FinalizeDeposits";
 // ---------------------------------------------------------------
 
 // Environment Variables
@@ -52,7 +53,7 @@ export const startCronJobs = () => {
 	//CRONJOBS
 	console.log("Starting cron job setup...");
 
-	cron.schedule("* * * * *", async () => {
+	cron.schedule("0 0 * * *", async () => {
 		finalizeDeposit();
 		console.log("Finalized Deposits!");
 		const queuedDeposits: Array<Deposit> = await getAllJsonOperationsQueued();
@@ -61,6 +62,11 @@ export const startCronJobs = () => {
 		} else {
 			LogMessage("No deposits found to initialize");
 		}
+	});
+
+	cron.schedule("0,30 * * * *", async () => {
+		cleanQueuedDeposits();
+		cleanFinalizedDeposits();
 	});
 
 	console.log("Cron job setup complete.");

@@ -15,11 +15,13 @@
 	"dependencies": {
 		"@keep-network/tbtc-v2.ts": "../keep-network-tbtc-v2.ts-v2.5.0-dev.tgz",
 		"axios": "^1.7.2",
+		"chokidar": "^3.6.0",
 		"compression": "^1.7.4",
 		"cors": "^2.8.5",
 		"eth-crypto": "^2.6.0",
 		"ethers": "5.7.2",
 		"express": "^4.18.2",
+		"fs-extra": "^11.2.0",
 		"helmet": "^7.1.0",
 		"node-cron": "^3.0.3"
 	},
