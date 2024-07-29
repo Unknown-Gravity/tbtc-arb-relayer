@@ -1,10 +1,8 @@
 import { Response } from "express";
 import CustomResponse from "../helpers/CustomResponse.helper";
 import { LogError } from "../utils/Logs";
-import { BigNumber, ethers } from "ethers";
 import { getAllJsonOperationsQueued } from "../utils/JsonUtils";
 import { initializeDepositsL1 } from "../services/InitializeDepositServices/InitializeDepositsL1";
-import { finalizeDeposit } from "../services/FinalizeDeposits";
 
 export default class Utils {
 	/**

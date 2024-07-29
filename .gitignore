@@ -2,6 +2,7 @@
 package-lock.json
 
 /data
+/dist
 
 # ADD .ENV FILE !!
 # .env
