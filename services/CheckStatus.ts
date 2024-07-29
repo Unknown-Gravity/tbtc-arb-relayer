@@ -1,6 +1,6 @@
-import { Deposit } from "../../types/Deposit.type";
-import { LogError } from "../../utils/Logs";
-import { L1BitcoinDepositor } from "../Core";
+import { Deposit } from "../types/Deposit.type";
+import { LogError } from "../utils/Logs";
+import { L1BitcoinDepositor } from "./Core";
 
 /**
  * @name checkTxStatus
@@ -10,9 +10,7 @@ import { L1BitcoinDepositor } from "../Core";
  */
 export const checkTxStatus = async (deposit: Deposit): Promise<number> => {
 	try {
-		const currentStatus = await L1BitcoinDepositor.deposits(deposit.id);
-		console.log("🚀 ~ checkTxStatus ~ currentStatus:", currentStatus);
-		return currentStatus;
+		return await L1BitcoinDepositor.deposits(deposit.id);
 	} catch (error) {
 		LogError("Error fetching status", error as Error);
 		return 0;
