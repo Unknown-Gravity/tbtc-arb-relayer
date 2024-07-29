@@ -13,6 +13,7 @@ import { TBTCVaultABI } from "../interfaces/TBTCVaultSepolia";
 import { attempFinalizeDeposit } from "./FinalizeDepositServices/AttempFinalizeDeposit";
 import { cleanFinalizedDeposits, cleanQueuedDeposits } from "./CleanupDeposits";
 import { finalizeDeposit } from "./FinalizeDeposits";
+import { NonceManager } from "@ethersproject/experimental";
 // ---------------------------------------------------------------
 
 // Environment Variables
@@ -31,6 +32,10 @@ const providerEth: ethers.providers.JsonRpcProvider = new ethers.providers.JsonR
 const signerArb: ethers.Wallet = new ethers.Wallet(privateKey, providerArb);
 const signerEth: ethers.Wallet = new ethers.Wallet(privateKey, providerEth);
 
+//NonceManager Wallets
+const nonceManagerArb = new NonceManager(signerArb);
+const nonceManagerEth = new NonceManager(signerEth);
+
 // Contracts
 export const L1BitcoinDepositor: ethers.Contract = new ethers.Contract(
 	L1BitcoinDepositor_Address,
@@ -44,11 +49,19 @@ export const L2BitcoinDepositor: ethers.Contract = new ethers.Contract(
 	signerArb
 );
 
-export const TBTCVault: ethers.Contract = new ethers.Contract(TBTCVaultAdress, TBTCVaultABI, signerEth);
+// Nonce Manager Contracts
+export const nonceManagerL1BitcoinDepositor = L1BitcoinDepositor.connect(nonceManagerEth);
+export const nonceManagerL2BitcoinDepositor = L2BitcoinDepositor.connect(nonceManagerArb);
 
+//SDK provider
+export const TBTCVault: ethers.Contract = new ethers.Contract(TBTCVaultAdress, TBTCVaultABI, signerEth);
 export const sdkPromise = TBTC.initializeSepolia(providerEth, true);
 
-// Start the cronjobs for the
+/**
+ * @name startCronJobs
+ * @description Starts the cron jobs for finalizing and initializing deposits.
+ */
+
 export const startCronJobs = () => {
 	//CRONJOBS
 	console.log("Starting cron job setup...");
@@ -72,12 +85,17 @@ export const startCronJobs = () => {
 	console.log("Cron job setup complete.");
 };
 
-//Listeners for initialize and finalize deposit
+/**
+ * @name checkEvents
+ * @description Sets up listeners for deposit initialization and finalization events.
+ */
+
 export const checkEvents = () => {
 	L2BitcoinDepositor.on("DepositInitialized", (fundingTx, reveal, l2DepositOwner, l2Sender) => {
 		const deposit: Deposit = createDeposit(fundingTx, reveal, l2DepositOwner, l2Sender);
 		writeNewJson(fundingTx, reveal, l2DepositOwner, l2Sender);
-		initializeDepositL1(deposit);
+		LogMessage(`Initilizing deposit | Id: ${deposit.id}`);
+		// initializeDepositL1(deposit);
 	});
 
 	TBTCVault.on("OptimisticMintingFinalized", (minter, depositKey, depositor, optimisticMintingDebt) => {

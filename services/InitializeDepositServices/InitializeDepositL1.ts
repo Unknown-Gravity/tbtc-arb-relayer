@@ -1,6 +1,6 @@
 import { Deposit } from "../../types/Deposit.type";
 import { writeJson } from "../../utils/JsonUtils";
-import { L1BitcoinDepositor } from "../Core";
+import { L1BitcoinDepositor, nonceManagerL1BitcoinDepositor } from "../Core";
 import { LogError, LogMessage } from "../../utils/Logs";
 
 /**
@@ -12,8 +12,11 @@ import { LogError, LogMessage } from "../../utils/Logs";
 
 export const initializeDepositL1 = async (deposit: Deposit): Promise<void> => {
 	try {
-		const value = (await L1BitcoinDepositor.quoteInitializeDeposit()).toString();
-		const tx = await L1BitcoinDepositor.initializeDeposit(deposit.id, { value });
+		const tx = await nonceManagerL1BitcoinDepositor.initializeDeposit(
+			deposit.L1OutputEvent.fundingTx,
+			deposit.L1OutputEvent.reveal,
+			deposit.L1OutputEvent.l2DepositOwner
+		);
 		await tx.wait();
 
 		const updatedDeposit: Deposit = {

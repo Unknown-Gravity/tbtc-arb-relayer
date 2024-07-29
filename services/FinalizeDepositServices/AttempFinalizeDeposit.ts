@@ -1,7 +1,7 @@
 import { Deposit } from "../../types/Deposit.type";
 import { writeJson } from "../../utils/JsonUtils";
 import { LogError, LogMessage } from "../../utils/Logs";
-import { L1BitcoinDepositor } from "../Core";
+import { L1BitcoinDepositor, nonceManagerL1BitcoinDepositor } from "../Core";
 
 /**
  * @name attemptFinalizeDeposit
@@ -15,8 +15,8 @@ export const attempFinalizeDeposit = async (deposit: Deposit): Promise<void> => 
 		const value = (await L1BitcoinDepositor.quoteFinalizeDeposit()).toString();
 		console.log("🚀 ~ attempFinalizeDeposit ~ value:", value.toString());
 		LogMessage(`Trying to finalized deposit with id: ${deposit.id}`);
-		await L1BitcoinDepositor.callStatic.finalizeDeposit(deposit.id, { value: value });
-		const dep = await L1BitcoinDepositor.finalizeDeposit(deposit.id, { value: value });
+		await nonceManagerL1BitcoinDepositor.callStatic.finalizeDeposit(deposit.id, { value: value });
+		const dep = await nonceManagerL1BitcoinDepositor.finalizeDeposit(deposit.id, { value: value });
 		await dep.wait();
 
 		const updatedDeposit: Deposit = {

@@ -3,7 +3,9 @@ import { deleteJson, getAllJsonOperationsFinalized, getAllJsonOperationsQueued }
 import { LogMessage } from "../utils/Logs";
 
 /**
- * Clean up the deposits that have been in the QUEUED state for more than 48 hours.
+ * @name cleanQueuedDeposits
+ * @description Cleans up the deposits that have been in the QUEUED state for more than 48 hours.
+ * @returns {Promise<void>} A promise that resolves when the old queued deposits are deleted.
  */
 
 // Current timestamp - 48 hours = 48 * 60 * 60 * 1000
@@ -41,7 +43,9 @@ export const cleanQueuedDeposits = async (): Promise<void> => {
 };
 
 /**
- * Clean up the deposits that have been in the FINALIZED state for more than 12 hours.
+ * @name cleanFinalizedDeposits
+ * @description Cleans up the deposits that have been in the FINALIZED state for more than 12 hours.
+ * @returns {Promise<void>} A promise that resolves when the old finalized deposits are deleted.
  */
 
 const FINALIZED_TIME: number = parseInt(process.env.CLEAN_FINALIZED_TIME || "12", 10);
