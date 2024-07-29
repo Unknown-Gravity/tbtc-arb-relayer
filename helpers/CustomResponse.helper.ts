@@ -1,16 +1,11 @@
 import { Response } from "express";
+import { ResponseJson } from "../types/ResponseJson.type";
 
 /**
  * @class CustomResponse
  * @description Response helper
  * @version 0.0.1
  */
-
-interface ResponseJson {
-	error: boolean | null;
-	message: string | null;
-	data: any;
-}
 
 export class CustomResponse {
 	private res: Response;

@@ -1,11 +1,5 @@
 import { createHash } from "crypto";
-
-interface FundingTransaction {
-	version: string;
-	inputVector: string;
-	outputVector: string;
-	locktime: string;
-}
+import { FundingTransaction } from "../types/FundingTransaction.type";
 
 /**
  * Converts a hexadecimal string to a Buffer.

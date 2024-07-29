@@ -1,3 +1,11 @@
+import { Deposit } from "../types/Deposit.type";
+import { DepositStatus } from "../types/DepositStatus.enum";
+import { updateFinalizedDeposit } from "../utils/Deposits";
+import { getAllJsonOperationsInitialized, writeJson } from "../utils/JsonUtils";
+import { LogError, LogMessage } from "../utils/Logs";
+import { checkTxStatus } from "./CheckStatus";
+import { L1BitcoinDepositor } from "./Core";
+
 /*
 That will finalize INITIALIZED deposits in the L1BitcoinDepositor contract.
 
@@ -12,10 +20,9 @@ This task should:
 More info: https://www.notion.so/thresholdnetwork/L2-tBTC-SDK-Relayer-Implementation-4dfedabfcf594c7d8ef80609541cf791?pvs=4
 */
 
-import { Deposit } from "../types/Deposit.type";
-import { getAllJsonOperationsInitialized } from "../utils/JsonUtils";
-import { LogError, LogWarning } from "../utils/Logs";
-import { checkAndWriteJson } from "./FinalizeDepositServices/CheckAndWriteJson";
+// ----------------------------------------------------------
+// |                     MAIN FUNCTIONS                     |
+// ----------------------------------------------------------
 
 /**
  * @name finalizeDeposit
@@ -25,16 +32,52 @@ import { checkAndWriteJson } from "./FinalizeDepositServices/CheckAndWriteJson";
 
 export const finalizeDeposit = async (): Promise<void> => {
 	try {
-		const initializedDeposits: Deposit[] = await getAllJsonOperationsInitialized();
-		if (initializedDeposits.length > 0) {
-			const promises: Promise<void>[] = initializedDeposits.map(async (deposit: Deposit) => {
-				checkAndWriteJson(deposit);
-			});
-			await Promise.all(promises);
-		} else {
-			LogWarning("No operations founded");
-		}
+		const initializedDeposits: Array<Deposit> = await getAllJsonOperationsInitialized();
+		if (initializedDeposits.length === 0) return;
+
+		const promises: Promise<void>[] = initializedDeposits.map(async (deposit: Deposit) => {
+			const status = await checkTxStatus(deposit);
+
+			if (status === DepositStatus.FINALIZED) {
+				updateFinalizedDeposit(deposit);
+			} else if (DepositStatus.INITIALIZED) {
+				await attempFinalizeDeposit(deposit);
+			}
+		});
+		await Promise.all(promises);
 	} catch (error) {
-		LogError("", error as Error);
+		LogError("Error finalizing deposits", error as Error);
+	}
+};
+
+// ----------------------------------------------------------
+// |                    AUXILIARY FUNCTIONS                 |
+// ----------------------------------------------------------
+
+/**
+ * @name attemptFinalizeDeposit
+ * @description Attempts to finalize a deposit. If successful, updates the status of the deposit in the JSON storage.
+ * @param {Deposit} deposit - The deposit object to be finalized.
+ * @returns {Promise<void>} A promise that resolves when the deposit status is updated in the JSON storage.
+ */
+
+export const attempFinalizeDeposit = async (deposit: Deposit): Promise<void> => {
+	try {
+		const value = (await L1BitcoinDepositor.quoteFinalizeDeposit()).toString();
+		LogMessage(`Trying to finalized deposit with id: ${deposit.id} | Value: ${value}`);
+
+		// Pre-call
+		await L1BitcoinDepositor.callStatic.finalizeDeposit(deposit.id, { value: value });
+
+		// Call
+		const tx = await L1BitcoinDepositor.finalizeDeposit(deposit.id, { value: value });
+
+		// Wait for the transaction to be mined
+		await tx.wait();
+
+		// Update the deposit status in the JSON storage
+		updateFinalizedDeposit(deposit, tx);
+	} catch (error) {
+		LogError("Desposit cant' be finalized", error as Error);
 	}
 };

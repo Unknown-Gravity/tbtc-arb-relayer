@@ -1,6 +1,6 @@
 import { Deposit } from "../types/Deposit.type";
 import { FundingTransaction } from "../types/FundingTransaction.type";
-import { createDeposit } from "./CreateDeposit";
+import { createDeposit } from "./Deposits";
 import { getStringDate } from "./Dates";
 import { getDepositId } from "./GetDepositId";
 import { getFundingTxHash, getTransactionHash } from "./GetTransactionHash";
@@ -167,9 +167,8 @@ const writeJson = (data: Deposit, operationId: string): boolean => {
  * @param {any} l2Sender - The sender address on the L2 network.
  */
 
-export const writeNewJson = (fundingTx: FundingTransaction, reveal: any, l2DepositOwner: any, l2Sender: any) => {
+export const writeNewJsonDeposit = (fundingTx: FundingTransaction, reveal: any, l2DepositOwner: any, l2Sender: any) => {
 	const deposit: Deposit = createDeposit(fundingTx, reveal, l2DepositOwner, l2Sender);
-
 	writeJson(deposit, deposit.id);
 };
 
