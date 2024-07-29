@@ -16,8 +16,7 @@ import Routes from "./routes/Routes";
 
 // Utils
 import { LogMessage } from "./utils/Logs";
-import { checkEvents, L2BitcoinDepositor, startCronJobs } from "./services/Core";
-import { initializeDepositsL1 } from "./services/InitializeDepositServices/InitializeDepositsL1";
+import { checkEvents, startCronJobs } from "./services/Core";
 
 // -------------------------------------------------------------------------
 // |                            APP CONFIG                                 |
@@ -70,7 +69,6 @@ app.use(Routes);
 
 app.listen(PORT, () => {
 	LogMessage(`Server running on port ${PORT}`);
-	LogMessage(`API: ${process.env.API_URL}`);
 	// Events
 	checkEvents();
 	//CronJobs

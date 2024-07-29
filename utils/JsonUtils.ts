@@ -1,9 +1,6 @@
 import { Deposit } from "../types/Deposit.type";
 import { FundingTransaction } from "../types/FundingTransaction.type";
 import { createDeposit } from "./Deposits";
-import { getStringDate } from "./Dates";
-import { getDepositId } from "./GetDepositId";
-import { getFundingTxHash, getTransactionHash } from "./GetTransactionHash";
 import { LogError } from "./Logs";
 
 const fs = require("fs");
