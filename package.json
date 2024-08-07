@@ -5,9 +5,12 @@
 	"main": "index.ts",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"start": "node --env-file .env index.js",
+		"start:dev": "npm run build && node dist/index.js",
+		"start": "npm run build && node --env-file .env dist/index.js",
+		"clean:build": "rimraf ./dist",
 		"dev": "ts-node-dev --watch --trace-warnings --env-file .env.dev index.ts",
-		"swagger": "node swagger.js"
+		"swagger": "node swagger.js",
+		"build": "npm run clean:build && tsc"
 	},
 	"keywords": [],
 	"author": "Unknown Gravity | All-in-one Blockchain Company",
@@ -15,13 +18,15 @@
 	"dependencies": {
 		"@ethersproject/experimental": "^5.7.0",
 		"axios": "^1.7.2",
+		"bitcoinjs-lib": "^6.0.1",
 		"compression": "^1.7.4",
 		"cors": "^2.8.5",
 		"eth-crypto": "^2.6.0",
 		"ethers": "5.7.2",
 		"express": "^4.18.2",
 		"helmet": "^7.1.0",
-		"node-cron": "^3.0.3"
+		"node-cron": "^3.0.3",
+		"rimraf": "^6.0.1"
 	},
 	"devDependencies": {
 		"@types/axios": "^0.14.0",
