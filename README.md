@@ -11,7 +11,6 @@ Welcome to the NodeJS project! This README provides all the information you need
     -   [DevDependencies](#devdependencies)
 -   [How to Start the Project](#how-to-start-the-project)
 -   [Project Scripts](#project-scripts)
--   [License](#license)
 
 ## Project Overview
 
@@ -23,12 +22,11 @@ To run the project using Docker, follow these steps:
 
 1. Download the [docker-compose.dev.yml](https://raw.githubusercontent.com/Unknown-Gravity/tbtc-arb-relayer/dev/docker-compose.dev.yml) file from this repository.
 
-2. Edit `docker-compose.dev.yml` with your customizations.
+2. Edit `docker-compose.dev.yml` with your customizations:
 
-    - Modification Details
-        - PRIVATE_KEY: The wallet private key you will use in your application.
-        - EthereumRPC: URL for the Ethereum RPC
-        - ArbitrumRPC: URL for the Arbitrum RPC
+    - PRIVATE_KEY: The wallet private key you will use in your application.
+    - EthereumRPC: URL for the Ethereum RPC
+    - ArbitrumRPC: URL for the Arbitrum RPC
 
 3. Run the following command to start the project:
     ```bash
@@ -79,5 +77,3 @@ The following npm scripts are avaliable:
 
     -   `npm run dev`: Runs the application in development mode.
     -   `npm start`: Runs the application in production mode
-
-## License
