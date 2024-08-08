@@ -25,6 +25,11 @@ To run the project using Docker, follow these steps:
 
 2. Edit `docker-compose.dev.yml` with your customizations.
 
+    - Modification Details
+        - PRIVATE_KEY: The wallet private key you will use in your application.
+        - EthereumRPC: URL for the Ethereum RPC
+        - ArbitrumRPC: URL for the Arbitrum RPC
+
 3. Run the following command to start the project:
     ```bash
     docker compose -f docker-compose.dev.yml up
