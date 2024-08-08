@@ -11,7 +11,6 @@ Welcome to the NodeJS project! This README provides all the information you need
     -   [DevDependencies](#devdependencies)
 -   [How to Start the Project](#how-to-start-the-project)
 -   [Project Scripts](#project-scripts)
--   [Contributing](#contributing)
 -   [License](#license)
 
 ## Project Overview
@@ -59,7 +58,7 @@ To run the project using Docker, follow these steps:
 -   **ts-node-dev**: ^2.0.0
 -   **typescript**: ^5.5.3
 
-## How to Start the Project
+## How to Start the Project (Local)
 
 ### Development Mode
 
@@ -68,3 +67,12 @@ To start the application in development mode, run:
 ```bash
 npm run dev
 ```
+
+## Project Scripts
+
+The following npm scripts are avaliable:
+
+    -   `npm run dev`: Runs the application in development mode.
+    -   `npm start`: Runs the application in production mode
+
+## License
