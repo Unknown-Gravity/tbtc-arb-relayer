@@ -5,4 +5,5 @@ package-lock.json
 /dist
 
 # ADD .ENV FILE !!
-# .env
+.env
+.env.dev
