@@ -2,6 +2,18 @@ import { Deposit } from "../types/Deposit.type";
 import { deleteJson, getAllJsonOperationsFinalized, getAllJsonOperationsQueued } from "../utils/JsonUtils";
 import { LogMessage } from "../utils/Logs";
 
+/****************************************************************************************
+The goal of this task is cleaning up trash deposits and preventing relayer’s congestion.
+
+This task should:
+- Delete (remove from persistent storage) QUEUED deposits that have been in that state for more than 48 hours.
+- Delete (remove from persistent storage) any deposits that are in the FINALIZED state for more than 12 hours.
+
+More info:
+https://www.notion.so/thresholdnetwork/L2-tBTC-SDK-Relayer-Implementation-4dfedabfcf594c7d8ef80609541cf791?pvs=4
+****************************************************************************************/
+
+
 /**
  * @name cleanQueuedDeposits
  * @description Cleans up the deposits that have been in the QUEUED state for more than 48 hours.
