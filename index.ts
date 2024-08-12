@@ -25,7 +25,7 @@ import { checkEvents, startCronJobs } from "./services/Core";
 const app = express();
 
 // Port
-const PORT = process.env.APP_PORT || 3333;
+const PORT = 3333;
 app.set("port", PORT);
 
 // -------------------------------------------------------------------------
@@ -36,7 +36,7 @@ app.set("port", PORT);
 // app.use(
 // 	cors({
 // 		credentials: true,
-// 		origin: process.env.APP_URL, // true para local? Compatibilidad con navegadores
+// 		origin: process.env.CORS_URL, // true para local? Compatibilidad con navegadores
 // 	})
 // );
 

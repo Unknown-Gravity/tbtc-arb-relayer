@@ -5,6 +5,7 @@ import { LogError } from "./Logs";
 
 const fs = require("fs");
 const path = require("path");
+let isNew = false;
 // const { LogError } = require("./Logs.js");
 
 // ---------------------------------------------------------------
@@ -12,6 +13,11 @@ const path = require("path");
 // ---------------------------------------------------------------
 
 const JSON_DIR = process.env.JSON_PATH || "./data/";
+const dirPath = path.resolve(".", JSON_DIR);
+
+const createDataFolder = () => {
+	fs.mkdirSync(dirPath);
+};
 
 /**
  * Get the filename of a JSON operation
@@ -64,8 +70,6 @@ const checkIfExistJson = (operationId: string): boolean => {
  * @returns {Promise<Array<Deposit>>} List of JSON files
  */
 const getAllJsonOperations = async (): Promise<Array<Deposit>> => {
-	const dirPath = path.resolve(".", JSON_DIR);
-
 	if (!fs.existsSync(dirPath)) {
 		fs.mkdirSync(dirPath);
 	}
@@ -144,6 +148,10 @@ const getJsonById = (operationId: string): Deposit | null => {
  * @returns {boolean} True if the JSON data was written successfully, false otherwise
  */
 const writeJson = (data: Deposit, operationId: string): boolean => {
+	if (!fs.existsSync(dirPath)) {
+		fs.mkdirSync(dirPath);
+	}
+
 	const filename = getFilename(operationId);
 
 	try {
