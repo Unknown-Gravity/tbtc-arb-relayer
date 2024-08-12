@@ -12,7 +12,8 @@ services:
         environment:
             APP_NAME: "tBTC Relayer"
             APP_POST: 3333
-            APP_URL: "http://localhost:3000"
+            CORS_ENABLED: "true"
+            CORS_URL: "http://localhost:3000"
             JSON_PATH: "./data/"
             CLEAN_QUEUED_TIME: 48
             CLEAN_FINALIZED_TIME: 12

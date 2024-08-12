@@ -5,7 +5,7 @@
 import express from "express";
 
 // Security
-// const cors = require("cors");
+import cors from "cors";
 import helmet from "helmet";
 
 // Compression
@@ -17,6 +17,7 @@ import Routes from "./routes/Routes";
 // Utils
 import { LogMessage } from "./utils/Logs";
 import { checkEvents, startCronJobs } from "./services/Core";
+import { checkAndCreateDataFolder } from "./utils/JsonUtils";
 
 // -------------------------------------------------------------------------
 // |                            APP CONFIG                                 |
@@ -32,14 +33,14 @@ app.set("port", PORT);
 // |                              SECURITY                                 |
 // -------------------------------------------------------------------------
 
-// CORS
-// app.use(
-// 	cors({
-// 		credentials: true,
-// 		origin: process.env.CORS_URL, // true para local? Compatibilidad con navegadores
-// 	})
-// );
-
+if (process.env.CORS_ENABLED === "true") {
+	app.use(
+		cors({
+			credentials: true,
+			origin: process.env.CORS_URL, // true para local? Compatibilidad con navegadores
+		})
+	);
+}
 // Helmet (Security middleware)
 app.use(helmet());
 
@@ -69,6 +70,8 @@ app.use(Routes);
 
 app.listen(PORT, () => {
 	LogMessage(`Server running on port ${PORT}`);
+	// Create data folder
+	checkAndCreateDataFolder();
 	// Events
 	checkEvents();
 	//CronJobs

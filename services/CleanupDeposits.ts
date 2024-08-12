@@ -8,9 +8,7 @@ import { LogMessage } from "../utils/Logs";
  * @returns {Promise<void>} A promise that resolves when the old queued deposits are deleted.
  */
 
-// Current timestamp - 48 hours = 48 * 60 * 60 * 1000
-const QUEUED_TIME: number = parseInt(process.env.CLEAN_QUEUED_TIME || "48", 10);
-const olderThan48Hours: number = QUEUED_TIME * 60 * 60 * 1000;
+const REMOVE_QUEUED_TIME: number = parseInt(process.env.CLEAN_QUEUED_TIME || "48", 10) * 60 * 60 * 1000;
 
 export const cleanQueuedDeposits = async (): Promise<void> => {
 	const operations: Deposit[] = await getAllJsonOperationsQueued();
@@ -24,7 +22,7 @@ export const cleanQueuedDeposits = async (): Promise<void> => {
 		const createdAt: number | null = operation.dates.createdAt
 			? new Date(operation.dates.createdAt).getTime()
 			: null;
-		return createdAt !== null && currentTime - createdAt > olderThan48Hours;
+		return createdAt !== null && currentTime - createdAt > REMOVE_QUEUED_TIME;
 	});
 
 	// Delete the deposits
@@ -46,8 +44,7 @@ export const cleanQueuedDeposits = async (): Promise<void> => {
  * @returns {Promise<void>} A promise that resolves when the old finalized deposits are deleted.
  */
 
-const FINALIZED_TIME: number = parseInt(process.env.CLEAN_FINALIZED_TIME || "12", 10);
-const olderThan12Hours: number = FINALIZED_TIME * 60 * 60 * 1000;
+const REMOVE_FINALIZED_TIME: number = parseInt(process.env.CLEAN_FINALIZED_TIME || "12", 10) * 60 * 60 * 1000;
 
 export const cleanFinalizedDeposits = async () => {
 	const operations: Deposit[] = await getAllJsonOperationsFinalized();
@@ -61,7 +58,7 @@ export const cleanFinalizedDeposits = async () => {
 			const finalizationAt: number | null = operation.dates.finalizationAt
 				? new Date(operation.dates.finalizationAt).getTime()
 				: null;
-			return finalizationAt !== null && currentTime - finalizationAt > olderThan12Hours;
+			return finalizationAt !== null && currentTime - finalizationAt > REMOVE_FINALIZED_TIME;
 		});
 
 		// Delete the deposits

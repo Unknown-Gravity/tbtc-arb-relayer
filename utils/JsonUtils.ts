@@ -5,8 +5,6 @@ import { LogError } from "./Logs";
 
 const fs = require("fs");
 const path = require("path");
-let isNew = false;
-// const { LogError } = require("./Logs.js");
 
 // ---------------------------------------------------------------
 // ------------------------- JSON UTILS --------------------------
@@ -15,8 +13,10 @@ let isNew = false;
 const JSON_DIR = process.env.JSON_PATH || "./data/";
 const dirPath = path.resolve(".", JSON_DIR);
 
-const createDataFolder = () => {
-	fs.mkdirSync(dirPath);
+const checkAndCreateDataFolder = () => {
+	if (!fs.existsSync(dirPath)) {
+		fs.mkdirSync(dirPath);
+	}
 };
 
 /**
@@ -70,9 +70,7 @@ const checkIfExistJson = (operationId: string): boolean => {
  * @returns {Promise<Array<Deposit>>} List of JSON files
  */
 const getAllJsonOperations = async (): Promise<Array<Deposit>> => {
-	if (!fs.existsSync(dirPath)) {
-		fs.mkdirSync(dirPath);
-	}
+	checkAndCreateDataFolder();
 
 	const files = await fs.promises.readdir(dirPath);
 	const jsonFiles = files.filter((file: JSON) => path.extname(file) === ".json");
@@ -148,9 +146,7 @@ const getJsonById = (operationId: string): Deposit | null => {
  * @returns {boolean} True if the JSON data was written successfully, false otherwise
  */
 const writeJson = (data: Deposit, operationId: string): boolean => {
-	if (!fs.existsSync(dirPath)) {
-		fs.mkdirSync(dirPath);
-	}
+	checkAndCreateDataFolder();
 
 	const filename = getFilename(operationId);
 
@@ -196,6 +192,9 @@ const deleteJson = (operationId: string): boolean => {
 };
 
 export {
+	// Create data folder
+	checkAndCreateDataFolder,
+
 	// Utils
 	isEmptyJson,
 	isValidJson,
