@@ -1,6 +1,6 @@
-# NodeJS Project
+# Threshold Network | tBTC Arbitrum relayer
 
-Welcome to the NodeJS project! This README provides all the information you need to get started and understand the structure of the project.
+Based on [L2 tBTC SDK Relayer Implementation](https://thresholdnetwork.notion.site/L2-tBTC-SDK-Relayer-Implementation-4dfedabfcf594c7d8ef80609541cf791?pvs=4)
 
 ## Table of Contents
 

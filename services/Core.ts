@@ -12,21 +12,26 @@ import { TBTCVaultABI } from "../interfaces/testnet/TBTCVaultSepolia";
 import { cleanFinalizedDeposits, cleanQueuedDeposits } from "./CleanupDeposits";
 import { attempInitializeDeposit, initializeDeposits } from "./InitializeDeposits";
 import { attempFinalizeDeposit, finalizeDeposit } from "./FinalizeDeposits";
-// ---------------------------------------------------------------
 
+// ---------------------------------------------------------------
 // Environment Variables
-const ArbitrumRPC: string = process.env.ArbitrumRPC || "";
-const EthereumRPC: string = process.env.EthereumRPC || "";
+// ---------------------------------------------------------------
+const ARBITRUM_RPC: string = process.env.ARBITRUM_RPC || "";
+const ETHEREUM_RPC: string = process.env.ETHEREUM_RPC || "";
 const L1BitcoinDepositor_Address: string = process.env.L1BitcoinDepositor || "";
 const L2BitcoinDepositor_Address: string = process.env.L2BitcoinDepositor || "";
 const TBTCVaultAdress: string = process.env.TBTCVaultSepolia || "";
 const privateKey: string = process.env.PRIVATE_KEY || "";
 
-// Provider
-const providerArb: ethers.providers.JsonRpcProvider = new ethers.providers.JsonRpcProvider(ArbitrumRPC);
-const providerEth: ethers.providers.JsonRpcProvider = new ethers.providers.JsonRpcProvider(EthereumRPC);
+// ---------------------------------------------------------------
+// Providers
+// ---------------------------------------------------------------
+const providerArb: ethers.providers.JsonRpcProvider = new ethers.providers.JsonRpcProvider(ARBITRUM_RPC);
+const providerEth: ethers.providers.JsonRpcProvider = new ethers.providers.JsonRpcProvider(ETHEREUM_RPC);
 
-//Signer
+// ---------------------------------------------------------------
+// Signers
+// ---------------------------------------------------------------
 const signerArb: ethers.Wallet = new ethers.Wallet(privateKey, providerArb);
 const signerEth: ethers.Wallet = new ethers.Wallet(privateKey, providerEth);
 
@@ -34,7 +39,9 @@ const signerEth: ethers.Wallet = new ethers.Wallet(privateKey, providerEth);
 const nonceManagerArb = new NonceManager(signerArb);
 const nonceManagerEth = new NonceManager(signerEth);
 
+// ---------------------------------------------------------------
 // Contracts
+// ---------------------------------------------------------------
 export const L1BitcoinDepositor: ethers.Contract = new ethers.Contract(
 	L1BitcoinDepositor_Address,
 	L1BitcoinDepositorABI,
@@ -47,8 +54,11 @@ export const L2BitcoinDepositor: ethers.Contract = new ethers.Contract(
 	nonceManagerArb
 );
 
-//SDK provider
 export const TBTCVault: ethers.Contract = new ethers.Contract(TBTCVaultAdress, TBTCVaultABI, signerEth);
+
+// ---------------------------------------------------------------
+// Cron Jobs
+// ---------------------------------------------------------------
 
 /**
  * @name startCronJobs
