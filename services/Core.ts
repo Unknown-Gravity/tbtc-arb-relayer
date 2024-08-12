@@ -1,15 +1,14 @@
 import { BigNumber, ethers } from "ethers";
 import cron from "node-cron";
-import { TBTC } from "@keep-network/tbtc-v2.ts";
 import { NonceManager } from "@ethersproject/experimental";
 
-import { L1BitcoinDepositorABI } from "../interfaces/L1BitcoinDepositor";
-import { L2BitcoinDepositorABI } from "../interfaces/L2BitcoinDepositor";
+import { L1BitcoinDepositorABI } from "../interfaces/testnet/L1BitcoinDepositor";
+import { L2BitcoinDepositorABI } from "../interfaces/testnet/L2BitcoinDepositor";
 import { getJsonById, writeNewJsonDeposit } from "../utils/JsonUtils";
 import { createDeposit } from "../utils/Deposits";
 import { Deposit } from "../types/Deposit.type";
 import { LogMessage } from "../utils/Logs";
-import { TBTCVaultABI } from "../interfaces/TBTCVaultSepolia";
+import { TBTCVaultABI } from "../interfaces/testnet/TBTCVaultSepolia";
 import { cleanFinalizedDeposits, cleanQueuedDeposits } from "./CleanupDeposits";
 import { attempInitializeDeposit, initializeDeposits } from "./InitializeDeposits";
 import { attempFinalizeDeposit, finalizeDeposit } from "./FinalizeDeposits";
@@ -50,7 +49,6 @@ export const L2BitcoinDepositor: ethers.Contract = new ethers.Contract(
 
 //SDK provider
 export const TBTCVault: ethers.Contract = new ethers.Contract(TBTCVaultAdress, TBTCVaultABI, signerEth);
-export const sdkPromise = TBTC.initializeSepolia(providerEth, true);
 
 /**
  * @name startCronJobs
