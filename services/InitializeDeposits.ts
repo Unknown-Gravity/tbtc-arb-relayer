@@ -3,7 +3,7 @@ import { DepositStatus } from "../types/DepositStatus.enum";
 import { updateInitializedDeposit } from "../utils/Deposits";
 import { getAllJsonOperationsQueued, writeJson } from "../utils/JsonUtils";
 import { LogError } from "../utils/Logs";
-import { checkTxStatus } from "./CheckStatus";
+import { checkTxStatus, filterDepositsActivityTime } from "./CheckStatus";
 import { L1BitcoinDepositor } from "./Core";
 
 /*****************************************************************************************
@@ -35,7 +35,14 @@ export const initializeDeposits = async () => {
 		const queuedDeposits: Array<Deposit> = await getAllJsonOperationsQueued();
 		if (queuedDeposits.length === 0) return;
 
-		const promises: Promise<void>[] = queuedDeposits.map(async (deposit: Deposit) => {
+		// Filter deposits that have more than 5 minutes since the last activity
+		// This is to avoid calling the contract for deposits that have been recently
+		// checked and are still in the same state
+
+		const filterDeposits = filterDepositsActivityTime(queuedDeposits);
+		if (filterDeposits.length === 0) return;
+
+		const promises: Promise<void>[] = filterDeposits.map(async (deposit: Deposit) => {
 			const status = await checkTxStatus(deposit);
 
 			if (status === DepositStatus.INITIALIZED) {
@@ -44,6 +51,8 @@ export const initializeDeposits = async () => {
 				await attempInitializeDeposit(deposit);
 			}
 		});
+
+		// Wait for all the promises to resolve
 		await Promise.all(promises);
 	} catch (error) {
 		LogError("Error in initializeDeposits:", error as Error);

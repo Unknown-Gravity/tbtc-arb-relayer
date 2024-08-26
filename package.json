@@ -4,13 +4,13 @@
 	"description": "Threshold Network tBTC Relayer for Arbitrum",
 	"main": "index.ts",
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
-		"start:dev": "npm run build && node dist/index.js",
 		"start": "npm run build && node --env-file .env dist/index.js",
-		"clean:build": "rimraf ./dist",
+		"start:dev": "npm run build && node dist/index.js",
 		"dev": "ts-node-dev --watch --trace-warnings --env-file .env.dev index.ts",
-		"swagger": "node swagger.js",
-		"build": "npm run clean:build && tsc"
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"build": "npm run clean:build && tsc",
+		"clean:build": "rimraf ./dist",
+		"swagger": "node swagger.js"
 	},
 	"keywords": [],
 	"author": "Unknown Gravity | All-in-one Blockchain Company",

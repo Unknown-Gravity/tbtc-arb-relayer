@@ -32,8 +32,9 @@ export type Deposit = {
 	};
 	dates: {
 		createdAt: EpochTimeStamp | null;
-
 		initializationAt: EpochTimeStamp | null;
 		finalizationAt: EpochTimeStamp | null;
+		lastActivityAt: EpochTimeStamp | null;
 	};
+	error: string | null;
 };

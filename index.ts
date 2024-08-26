@@ -16,7 +16,7 @@ import Routes from "./routes/Routes";
 
 // Utils
 import { LogMessage } from "./utils/Logs";
-import { checkEvents, startCronJobs } from "./services/Core";
+import { createEventListeners, startCronJobs } from "./services/Core";
 import { checkAndCreateDataFolder } from "./utils/JsonUtils";
 
 // -------------------------------------------------------------------------
@@ -73,7 +73,7 @@ app.listen(PORT, () => {
 	// Create data folder
 	checkAndCreateDataFolder();
 	// Events
-	checkEvents();
+	createEventListeners();
 	//CronJobs
 	startCronJobs();
 });

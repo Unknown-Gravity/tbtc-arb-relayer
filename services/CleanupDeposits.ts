@@ -13,7 +13,6 @@ More info:
 https://www.notion.so/thresholdnetwork/L2-tBTC-SDK-Relayer-Implementation-4dfedabfcf594c7d8ef80609541cf791?pvs=4
 ****************************************************************************************/
 
-
 /**
  * @name cleanQueuedDeposits
  * @description Cleans up the deposits that have been in the QUEUED state for more than 48 hours.
@@ -26,26 +25,22 @@ export const cleanQueuedDeposits = async (): Promise<void> => {
 	const operations: Deposit[] = await getAllJsonOperationsQueued();
 	if (operations.length === 0) return;
 
-	// Get the current timestamp
-	const currentTime: EpochTimeStamp = Date.now();
+	const currentTime = Date.now();
 
-	// Filter the deposits that have been in the QUEUED state for more than 48 hours
-	const depositsToDelete: Deposit[] = operations.filter((operation) => {
-		const createdAt: number | null = operation.dates.createdAt
-			? new Date(operation.dates.createdAt).getTime()
-			: null;
+	// Filter deposits that have been in the QUEUED state for more than 48 hours
+	const depositsToDelete = operations.filter((operation) => {
+		const createdAt = operation.dates.createdAt ? new Date(operation.dates.createdAt).getTime() : null;
 		return createdAt !== null && currentTime - createdAt > REMOVE_QUEUED_TIME;
 	});
 
-	// Delete the deposits
 	depositsToDelete.forEach((deposit) => {
+		const createdAtTime = deposit.dates.createdAt ? new Date(deposit.dates.createdAt).getTime() : 0;
+		const difference = currentTime - createdAtTime;
+
 		LogMessage(
-			`Deleting QUEUED deposit with ID ${deposit.id} | Actual: ${currentTime} | Creation: ${
-				deposit.dates.createdAt
-			} | Difference: ${
-				currentTime - (deposit.dates.createdAt ? new Date(deposit.dates.createdAt).getTime() : 0)
-			}`
+			`Deleting QUEUED deposit with ID ${deposit.id} | Actual: ${currentTime} | Creation: ${deposit.dates.createdAt} | Difference: ${difference}`
 		);
+
 		deleteJson(deposit.id);
 	});
 };
@@ -58,31 +53,28 @@ export const cleanQueuedDeposits = async (): Promise<void> => {
 
 const REMOVE_FINALIZED_TIME: number = parseInt(process.env.CLEAN_FINALIZED_TIME || "12", 10) * 60 * 60 * 1000;
 
-export const cleanFinalizedDeposits = async () => {
+export const cleanFinalizedDeposits = async (): Promise<void> => {
 	const operations: Deposit[] = await getAllJsonOperationsFinalized();
+	if (operations.length === 0) return;
 
-	if (operations.length > 0) {
-		// Get the current timestamp
-		const currentTime: EpochTimeStamp = new Date().getTime();
+	const currentTime = Date.now();
 
-		// Filter the deposits that have been in the FINALIZED state for more than 12 hours
-		const depositsToDelete: Deposit[] = operations.filter((operation) => {
-			const finalizationAt: number | null = operation.dates.finalizationAt
-				? new Date(operation.dates.finalizationAt).getTime()
-				: null;
-			return finalizationAt !== null && currentTime - finalizationAt > REMOVE_FINALIZED_TIME;
-		});
+	// Filter deposits that have been in the FINALIZED state for more than 12 hours
+	const depositsToDelete = operations.filter((operation) => {
+		const finalizationAt = operation.dates.finalizationAt
+			? new Date(operation.dates.finalizationAt).getTime()
+			: null;
+		return finalizationAt !== null && currentTime - finalizationAt > REMOVE_FINALIZED_TIME;
+	});
 
-		// Delete the deposits
-		depositsToDelete.forEach((deposit) => {
-			LogMessage(
-				`Deleting FINALIZED deposit with ID ${deposit.id} | Actual: ${currentTime} | Creation: ${
-					deposit.dates.createdAt
-				} | Difference: ${
-					currentTime - (deposit.dates.createdAt ? new Date(deposit.dates.createdAt).getTime() : 0)
-				}`
-			);
-			deleteJson(deposit.id);
-		});
-	}
+	depositsToDelete.forEach((deposit) => {
+		const createdAtTime = deposit.dates.createdAt ? new Date(deposit.dates.createdAt).getTime() : 0;
+		const difference = currentTime - createdAtTime;
+
+		LogMessage(
+			`Deleting FINALIZED deposit with ID ${deposit.id} | Actual: ${currentTime} | Creation: ${deposit.dates.createdAt} | Difference: ${difference}`
+		);
+
+		deleteJson(deposit.id);
+	});
 };

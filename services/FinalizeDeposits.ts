@@ -3,7 +3,7 @@ import { DepositStatus } from "../types/DepositStatus.enum";
 import { updateFinalizedDeposit } from "../utils/Deposits";
 import { getAllJsonOperationsInitialized, writeJson } from "../utils/JsonUtils";
 import { LogError, LogMessage } from "../utils/Logs";
-import { checkTxStatus } from "./CheckStatus";
+import { checkTxStatus, filterDepositsActivityTime } from "./CheckStatus";
 import { L1BitcoinDepositor } from "./Core";
 
 /*****************************************************************************************
@@ -36,6 +36,12 @@ export const finalizeDeposit = async (): Promise<void> => {
 		const initializedDeposits: Array<Deposit> = await getAllJsonOperationsInitialized();
 		if (initializedDeposits.length === 0) return;
 
+		// Filter deposits that have more than 5 minutes since the last activity
+		// This is to avoid calling the contract for deposits that have been recently
+		// checked and are still in the same state
+		const filterDeposits = filterDepositsActivityTime(initializedDeposits);
+		if (filterDeposits.length === 0) return;
+
 		const promises: Promise<void>[] = initializedDeposits.map(async (deposit: Deposit) => {
 			const status = await checkTxStatus(deposit);
 
@@ -45,6 +51,8 @@ export const finalizeDeposit = async (): Promise<void> => {
 				await attempFinalizeDeposit(deposit);
 			}
 		});
+
+		// Wait for all the promises to resolve
 		await Promise.all(promises);
 	} catch (error) {
 		LogError("Error finalizing deposits", error as Error);

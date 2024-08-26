@@ -66,7 +66,9 @@ export const createDeposit = (
 			createdAt: new Date().getTime(),
 			initializationAt: null,
 			finalizationAt: null,
+			lastActivityAt: new Date().getTime(),
 		},
+		error: null,
 	};
 	return deposit;
 };
@@ -80,19 +82,27 @@ export const createDeposit = (
  * @param {Deposit} deposit - The deposit object to be updated.
  * @param {any} tx - The transaction object containing the finalization transaction hash.
  */
-export const updateFinalizedDeposit = (deposit: Deposit, tx?: any) => {
-	let updatedDeposit: Deposit = {
+export const updateFinalizedDeposit = (deposit: Deposit, tx?: any, error?: string) => {
+	// Crear el objeto updatedDeposit con propiedades condicionales
+	const updatedDeposit: Deposit = {
 		...deposit,
 		status: "FINALIZED",
-		dates: { ...deposit.dates, finalizationAt: Date.now() },
+		dates: {
+			...deposit.dates,
+			finalizationAt: Date.now(),
+			lastActivityAt: Date.now(),
+		},
+		hashes: tx
+			? {
+					...deposit.hashes,
+					eth: {
+						...deposit.hashes.eth,
+						finalizeTxHash: tx.hash,
+					},
+			  }
+			: deposit.hashes, // Usa los hashes originales si tx no está presente
+		error: error || deposit.error, // Usa el error proporcionado o conserva el original si no hay error
 	};
-
-	if (tx) {
-		updatedDeposit = {
-			...updatedDeposit,
-			hashes: { ...deposit.hashes, eth: { ...deposit.hashes.eth, finalizeTxHash: tx.hash } },
-		};
-	}
 
 	writeJson(updatedDeposit, deposit.id);
 	LogMessage(`Deposit has been finalized | Id: ${deposit.id}`);
@@ -107,19 +117,27 @@ export const updateFinalizedDeposit = (deposit: Deposit, tx?: any) => {
  * @param {Deposit} deposit - The deposit object to be updated.
  * @param {any} tx - The transaction object containing the initialization transaction hash.
  */
-export const updateInitializedDeposit = (deposit: Deposit, tx?: any) => {
-	let updatedDeposit: Deposit = {
+export const updateInitializedDeposit = (deposit: Deposit, tx?: any, error?: string) => {
+	// Crear el objeto updatedDeposit con propiedades condicionales
+	const updatedDeposit: Deposit = {
 		...deposit,
 		status: "INITIALIZED",
-		dates: { ...deposit.dates, initializationAt: Date.now() },
+		dates: {
+			...deposit.dates,
+			initializationAt: Date.now(),
+			lastActivityAt: Date.now(),
+		},
+		hashes: tx
+			? {
+					...deposit.hashes,
+					eth: {
+						...deposit.hashes.eth,
+						initializeTxHash: tx.hash,
+					},
+			  }
+			: deposit.hashes, // Utiliza hashes originales si tx no está presente
+		error: error || deposit.error, // Usa el error proporcionado o conserva el original si no hay error
 	};
-
-	if (tx) {
-		updatedDeposit = {
-			...updatedDeposit,
-			hashes: { ...deposit.hashes, eth: { ...deposit.hashes.eth, initializeTxHash: tx.hash } },
-		};
-	}
 
 	writeJson(updatedDeposit, deposit.id);
 	LogMessage(`Deposit has been initialized | Id: ${deposit.id}`);
