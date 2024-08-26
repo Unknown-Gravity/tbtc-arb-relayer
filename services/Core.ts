@@ -23,6 +23,8 @@ const L2BitcoinDepositor_Address: string = process.env.L2BitcoinDepositor || "";
 const TBTCVaultAdress: string = process.env.TBTCVaultSepolia || "";
 const privateKey: string = process.env.PRIVATE_KEY || "";
 
+export const TIME_TO_RETRY = 1000 * 60 * 5; // 5 minutes
+
 // ---------------------------------------------------------------
 // Providers
 // ---------------------------------------------------------------
@@ -69,12 +71,14 @@ export const startCronJobs = () => {
 	//CRONJOBS
 	LogMessage("Starting cron job setup...");
 
-	cron.schedule("0 0 * * *", async () => {
+	// Every minute (but only launch after 5 minutes - Check TIME_TO_RETRY)
+	cron.schedule("* * * * *", async () => {
 		finalizeDeposit();
 		initializeDeposits();
 	});
 
-	cron.schedule("0,30 * * * *", async () => {
+	// Every 10 minutes (but only launch after specified times)
+	cron.schedule("*/10 * * * *", async () => {
 		cleanQueuedDeposits();
 		cleanFinalizedDeposits();
 	});
@@ -83,11 +87,12 @@ export const startCronJobs = () => {
 };
 
 /**
- * @name checkEvents
+ * @name createEventListeners
  * @description Sets up listeners for deposit initialization and finalization events.
  */
+export const createEventListeners = () => {
+	LogMessage("Setting up event listeners...");
 
-export const checkEvents = () => {
 	L2BitcoinDepositor.on("DepositInitialized", (fundingTx, reveal, l2DepositOwner, l2Sender) => {
 		const deposit: Deposit = createDeposit(fundingTx, reveal, l2DepositOwner, l2Sender);
 		writeNewJsonDeposit(fundingTx, reveal, l2DepositOwner, l2Sender);
@@ -100,6 +105,8 @@ export const checkEvents = () => {
 		const deposit: Deposit | null = getJsonById(BigDepositKey.toString());
 		if (deposit) attempFinalizeDeposit(deposit);
 	});
+
+	LogMessage("Event listeners setup complete.");
 };
 
 // ---------------------------------------------------------------

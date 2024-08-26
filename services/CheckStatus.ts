@@ -1,6 +1,6 @@
 import { Deposit } from "../types/Deposit.type";
 import { LogError } from "../utils/Logs";
-import { L1BitcoinDepositor } from "./Core";
+import { L1BitcoinDepositor, TIME_TO_RETRY } from "./Core";
 
 /**
  * @name checkTxStatus
@@ -15,4 +15,10 @@ export const checkTxStatus = async (deposit: Deposit): Promise<number> => {
 		LogError("Error fetching status", error as Error);
 		return 0;
 	}
+};
+
+export const filterDepositsActivityTime = (deposits: Array<Deposit>): Array<Deposit> => {
+	return deposits.filter((deposit: Deposit) => {
+		return deposit.dates.lastActivityAt === null || deposit.dates.lastActivityAt + TIME_TO_RETRY > Date.now();
+	});
 };
