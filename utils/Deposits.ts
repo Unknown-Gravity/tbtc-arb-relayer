@@ -83,29 +83,33 @@ export const createDeposit = (
  * @param {any} tx - The transaction object containing the finalization transaction hash.
  */
 export const updateFinalizedDeposit = (deposit: Deposit, tx?: any, error?: string) => {
+	const newStatus = tx ? "FINALIZED" : deposit.status;
+	const newFinalizationAt = tx ? Date.now() : deposit.dates.finalizationAt;
+	const newHash = tx
+		? {
+				...deposit.hashes,
+				eth: {
+					...deposit.hashes.eth,
+					finalizeTxHash: tx.hash,
+				},
+		  }
+		: deposit.hashes;
+
 	// Crear el objeto updatedDeposit con propiedades condicionales
 	const updatedDeposit: Deposit = {
 		...deposit,
-		status: "FINALIZED",
+		status: newStatus,
 		dates: {
 			...deposit.dates,
-			finalizationAt: Date.now(),
+			finalizationAt: newFinalizationAt,
 			lastActivityAt: Date.now(),
 		},
-		hashes: tx
-			? {
-					...deposit.hashes,
-					eth: {
-						...deposit.hashes.eth,
-						finalizeTxHash: tx.hash,
-					},
-			  }
-			: deposit.hashes, // Usa los hashes originales si tx no está presente
-		error: error || deposit.error, // Usa el error proporcionado o conserva el original si no hay error
+		hashes: newHash,
+		error: error ? error : null,
 	};
 
 	writeJson(updatedDeposit, deposit.id);
-	LogMessage(`Deposit has been finalized | Id: ${deposit.id}`);
+	if (tx) LogMessage(`Deposit has been finalized | Id: ${deposit.id} | Hash: ${tx.hash}`);
 };
 
 /**
@@ -119,28 +123,32 @@ export const updateFinalizedDeposit = (deposit: Deposit, tx?: any, error?: strin
  */
 export const updateInitializedDeposit = (deposit: Deposit, tx?: any, error?: string) => {
 	// Crear el objeto updatedDeposit con propiedades condicionales
+	const newStatus = tx ? "INITIALIZED" : deposit.status;
+	const newInitializationAt = tx ? Date.now() : deposit.dates.initializationAt;
+	const newHash = tx
+		? {
+				...deposit.hashes,
+				eth: {
+					...deposit.hashes.eth,
+					initializeTxHash: tx.hash,
+				},
+		  }
+		: deposit.hashes;
+
 	const updatedDeposit: Deposit = {
 		...deposit,
-		status: "INITIALIZED",
+		status: newStatus,
 		dates: {
 			...deposit.dates,
-			initializationAt: Date.now(),
+			initializationAt: newInitializationAt,
 			lastActivityAt: Date.now(),
 		},
-		hashes: tx
-			? {
-					...deposit.hashes,
-					eth: {
-						...deposit.hashes.eth,
-						initializeTxHash: tx.hash,
-					},
-			  }
-			: deposit.hashes, // Utiliza hashes originales si tx no está presente
-		error: error || deposit.error, // Usa el error proporcionado o conserva el original si no hay error
+		hashes: newHash,
+		error: error ? error : null,
 	};
 
 	writeJson(updatedDeposit, deposit.id);
-	LogMessage(`Deposit has been initialized | Id: ${deposit.id}`);
+	if (tx) LogMessage(`Deposit has been initialized | Id: ${deposit.id} | Hash: ${tx.hash}`);
 };
 
 /**
@@ -158,9 +166,7 @@ export const updateInitializedDeposit = (deposit: Deposit, tx?: any, error?: str
 
 export const getDepositId = (fundingTxHash: string, fundingOutputIndex: number): string => {
 	// Asegúrate de que fundingTxHash es una cadena de 64 caracteres hexadecimales
-	if (fundingTxHash.length !== 64) {
-		throw new Error("Invalid fundingTxHash");
-	}
+	if (fundingTxHash.length !== 64) throw new Error("Invalid fundingTxHash");
 
 	// Convertir el fundingTxHash a un formato de bytes32 esperado por ethers.js
 	const fundingTxHashBytes = "0x" + fundingTxHash;
