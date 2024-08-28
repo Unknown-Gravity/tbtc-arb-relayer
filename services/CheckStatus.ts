@@ -19,6 +19,7 @@ export const checkTxStatus = async (deposit: Deposit): Promise<number> => {
 
 export const filterDepositsActivityTime = (deposits: Array<Deposit>): Array<Deposit> => {
 	return deposits.filter((deposit: Deposit) => {
-		return deposit.dates.lastActivityAt === null || deposit.dates.lastActivityAt + TIME_TO_RETRY > Date.now();
+		const isRetryTime = deposit.dates.lastActivityAt + TIME_TO_RETRY < Date.now();
+		return deposit.dates.lastActivityAt === null || isRetryTime;
 	});
 };

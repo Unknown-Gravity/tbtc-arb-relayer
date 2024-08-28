@@ -42,6 +42,8 @@ export const finalizeDeposit = async (): Promise<void> => {
 		const filterDeposits = filterDepositsActivityTime(initializedDeposits);
 		if (filterDeposits.length === 0) return;
 
+		LogMessage(`FINALIZE | To be processed: ${filterDeposits.length} deposits`);
+
 		const promises: Promise<void>[] = initializedDeposits.map(async (deposit: Deposit) => {
 			const status = await checkTxStatus(deposit);
 
@@ -73,20 +75,25 @@ export const finalizeDeposit = async (): Promise<void> => {
 export const attempFinalizeDeposit = async (deposit: Deposit): Promise<void> => {
 	try {
 		const value = (await L1BitcoinDepositor.quoteFinalizeDeposit()).toString();
-		LogMessage(`Trying to finalized deposit with id: ${deposit.id} | Value: ${value}`);
+		LogMessage(`FINALIZE | ID: ${deposit.id} | Value: ${value}`);
 
 		// Pre-call
 		await L1BitcoinDepositor.callStatic.finalizeDeposit(deposit.id, { value: value });
+		LogMessage(`FINALIZE | Pre-call successful | ID: ${deposit.id}`);
 
 		// Call
 		const tx = await L1BitcoinDepositor.finalizeDeposit(deposit.id, { value: value });
 
+		LogMessage(`FINALIZE | Waiting to be mined | ID: ${deposit.id} | TxHash: ${tx.hash}`);
 		// Wait for the transaction to be mined
 		await tx.wait();
+		LogMessage(`FINALIZE | Transaction mined | ID: ${deposit.id} | TxHash: ${tx.hash}`);
 
 		// Update the deposit status in the JSON storage
 		updateFinalizedDeposit(deposit, tx);
-	} catch (error) {
-		LogError("Desposit cant' be finalized", error as Error);
+	} catch (error: any) {
+		const reason = error.reason ? error.reason : "Unknown error";
+		LogError(`Error finalizing deposit | ID: ${deposit.id} | Reason: `, reason);
+		updateFinalizedDeposit(deposit, null, reason);
 	}
 };
