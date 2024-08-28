@@ -1,6 +1,7 @@
 import { getStringDate } from "./Dates";
 
 const APP_NAME = (process.env.APP_NAME || "Unknown Gravity").toUpperCase();
+const VERBOSE_APP = process.env.VERBOSE_APP === "true";
 
 // ---------------------------------------------------------------
 // --------------------- UTILITY FUNCTIONS -----------------------
@@ -27,6 +28,7 @@ const formatLog = (message: string): string => {
  * @returns {void}
  */
 const LogMessage = (message: string): void => {
+	if (!VERBOSE_APP) return;
 	const log: string = formatLog(message);
 	console.log(log); // NO BORRAR..
 };
