@@ -10,16 +10,27 @@ services:
         ports:
             - "4000:3333"
         environment:
+            # API Name
             APP_NAME: "tBTC Relayer"
+            # API Version
             APP_VERSION: "1.0.0"
+            # CORS (Cross-Origin Resource Sharing) enabled
             CORS_ENABLED: "true"
+            # CORS URL
             CORS_URL: "http://localhost:3000"
+            # File path to store JSON data
             JSON_PATH: "./data/"
+            # Verbose mode
+            VERBOSE_APP: "true"
+            # Timers
             CLEAN_QUEUED_TIME: 48
             CLEAN_FINALIZED_TIME: 12
+            # Key
             PRIVATE_KEY: "..."
+            # RPC
             ETHEREUM_RPC: "..."
             ARBITRUM_RPC: "..."
+            # Contracts
             L1BitcoinDepositor: "0xD9B523fb879C63b00ef14e48C98f4e3398d3BA2D"
             L2BitcoinDepositor: "0xB2fEC598a9374078Bb639f3d70555fc4389b7a78"
             TBTCVaultSepolia: "0xB5679dE944A79732A75CE556191DF11F489448d5"
