@@ -2,7 +2,7 @@ import { Deposit } from "../types/Deposit.type";
 import { DepositStatus } from "../types/DepositStatus.enum";
 import { updateInitializedDeposit } from "../utils/Deposits";
 import { getAllJsonOperationsQueued, writeJson } from "../utils/JsonUtils";
-import { LogError } from "../utils/Logs";
+import { LogError, LogMessage } from "../utils/Logs";
 import { checkTxStatus, filterDepositsActivityTime } from "./CheckStatus";
 import { L1BitcoinDepositor } from "./Core";
 
@@ -42,6 +42,8 @@ export const initializeDeposits = async () => {
 		const filterDeposits = filterDepositsActivityTime(queuedDeposits);
 		if (filterDeposits.length === 0) return;
 
+		LogMessage(`INITIALIZE | To be processed: ${filterDeposits.length} deposits`);
+
 		const promises: Promise<void>[] = filterDeposits.map(async (deposit: Deposit) => {
 			const status = await checkTxStatus(deposit);
 
@@ -78,6 +80,7 @@ export const attempInitializeDeposit = async (deposit: Deposit): Promise<void> =
 			deposit.L1OutputEvent.reveal,
 			deposit.L1OutputEvent.l2DepositOwner
 		);
+		LogMessage(`INITIALIZE | Pre-call successful | ID: ${deposit.id}`);
 
 		// Call
 		const tx = await L1BitcoinDepositor.initializeDeposit(
@@ -86,12 +89,16 @@ export const attempInitializeDeposit = async (deposit: Deposit): Promise<void> =
 			deposit.L1OutputEvent.l2DepositOwner
 		);
 
+		LogMessage(`INITIALIZE | Waiting to be mined | ID: ${deposit.id} | TxHash: ${tx.hash}`);
 		// Wait for the transaction to be mined
 		await tx.wait();
+		LogMessage(`INITIALIZE | Transaction mined | ID: ${deposit.id} | TxHash: ${tx.hash}`);
 
 		// Update the deposit status in the JSON storage
 		updateInitializedDeposit(deposit, tx);
-	} catch (error) {
-		LogError(`Error initializing deposit for txHash ${deposit.hashes.btc.btcTxHash}:`, error as Error);
+	} catch (error: any) {
+		const reason = error.reason ? error.reason : "Unknown error";
+		LogError(`INITIALIZE | ERROR | ID: ${deposit.id} | Reason: `, reason);
+		updateInitializedDeposit(deposit, null, reason);
 	}
 };
