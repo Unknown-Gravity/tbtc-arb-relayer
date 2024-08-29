@@ -1,6 +1,6 @@
 import { Deposit } from "../types/Deposit.type";
 import { DepositStatus } from "../types/DepositStatus.enum";
-import { updateFinalizedDeposit } from "../utils/Deposits";
+import { updateFinalizedDeposit, updateLastActivity } from "../utils/Deposits";
 import { getAllJsonOperationsInitialized, writeJson } from "../utils/JsonUtils";
 import { LogError, LogMessage } from "../utils/Logs";
 import { checkTxStatus, filterDepositsActivityTime } from "./CheckStatus";
@@ -45,6 +45,9 @@ export const finalizeDeposit = async (): Promise<void> => {
 		LogMessage(`FINALIZE | To be processed: ${filterDeposits.length} deposits`);
 
 		const promises: Promise<void>[] = initializedDeposits.map(async (deposit: Deposit) => {
+			// Update the last activity timestamp of the deposit
+			deposit = updateLastActivity(deposit);
+			// Check the status of the deposit in the contract
 			const status = await checkTxStatus(deposit);
 
 			if (status === DepositStatus.FINALIZED) {
