@@ -152,6 +152,26 @@ export const updateInitializedDeposit = (deposit: Deposit, tx?: any, error?: str
 };
 
 /**
+ * @name updateLastActivity
+ * @description Updates the last activity timestamp of a deposit.
+ * This function takes a deposit object and updates the last activity timestamp to the current time.
+ * The updated deposit object is then written to the JSON storage.
+ * @param {Deposit} deposit - The deposit object to be updated.
+ */
+export const updateLastActivity = (deposit: Deposit) => {
+	const updatedDeposit: Deposit = {
+		...deposit,
+		dates: {
+			...deposit.dates,
+			lastActivityAt: Date.now(),
+		},
+	};
+
+	writeJson(updatedDeposit, deposit.id);
+	return updatedDeposit;
+};
+
+/**
  * @name getDepositId
  * @description Generates a unique deposit ID by encoding the Bitcoin funding transaction hash and output index,
  * then hashing the result using keccak256.
