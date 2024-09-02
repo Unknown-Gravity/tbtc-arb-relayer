@@ -90,7 +90,7 @@ export const updateFinalizedDeposit = (deposit: Deposit, tx?: any, error?: strin
 				...deposit.hashes,
 				eth: {
 					...deposit.hashes.eth,
-					finalizeTxHash: tx.hash,
+					finalizeTxHash: tx?.hash ? tx.hash : null,
 				},
 		  }
 		: deposit.hashes;
@@ -130,7 +130,7 @@ export const updateInitializedDeposit = (deposit: Deposit, tx?: any, error?: str
 				...deposit.hashes,
 				eth: {
 					...deposit.hashes.eth,
-					initializeTxHash: tx.hash,
+					initializeTxHash: tx?.hash ? tx.hash : null,
 				},
 		  }
 		: deposit.hashes;
