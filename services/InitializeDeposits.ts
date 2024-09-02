@@ -51,7 +51,7 @@ export const initializeDeposits = async () => {
 			const status = await checkTxStatus(deposit);
 
 			if (status === DepositStatus.INITIALIZED) {
-				updateInitializedDeposit(deposit);
+				updateInitializedDeposit(deposit, "Deposit already initialized");
 			} else if (status === DepositStatus.QUEUED) {
 				await attempInitializeDeposit(deposit);
 			}
@@ -77,6 +77,7 @@ export const initializeDeposits = async () => {
 
 export const attempInitializeDeposit = async (deposit: Deposit): Promise<void> => {
 	try {
+		LogMessage(`INITIALIZE | Pre-call checking... | ID: ${deposit.id}`);
 		// Pre-call
 		await L1BitcoinDepositor.callStatic.initializeDeposit(
 			deposit.L1OutputEvent.fundingTx,

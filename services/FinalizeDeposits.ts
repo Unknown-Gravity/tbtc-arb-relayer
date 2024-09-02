@@ -51,7 +51,7 @@ export const finalizeDeposit = async (): Promise<void> => {
 			const status = await checkTxStatus(deposit);
 
 			if (status === DepositStatus.FINALIZED) {
-				updateFinalizedDeposit(deposit);
+				updateFinalizedDeposit(deposit, "Deposit already finalized");
 			} else if (DepositStatus.INITIALIZED) {
 				await attempFinalizeDeposit(deposit);
 			}
@@ -81,6 +81,7 @@ export const attempFinalizeDeposit = async (deposit: Deposit): Promise<void> => 
 		LogMessage(`FINALIZE | ID: ${deposit.id} | Value: ${value}`);
 
 		// Pre-call
+		LogMessage(`FINALIZE | Pre-call checking... | ID: ${deposit.id}`);
 		await L1BitcoinDepositor.callStatic.finalizeDeposit(deposit.id, { value: value });
 		LogMessage(`FINALIZE | Pre-call successful | ID: ${deposit.id}`);
 
