@@ -78,10 +78,9 @@ export const finalizeDeposit = async (): Promise<void> => {
 export const attempFinalizeDeposit = async (deposit: Deposit): Promise<void> => {
 	try {
 		const value = (await L1BitcoinDepositor.quoteFinalizeDeposit()).toString();
-		LogMessage(`FINALIZE | ID: ${deposit.id} | Value: ${value}`);
 
 		// Pre-call
-		LogMessage(`FINALIZE | Pre-call checking... | ID: ${deposit.id}`);
+		LogMessage(`FINALIZE | Pre-call checking... | ID: ${deposit.id} | Value: ${value}`);
 		await L1BitcoinDepositor.callStatic.finalizeDeposit(deposit.id, { value: value });
 		LogMessage(`FINALIZE | Pre-call successful | ID: ${deposit.id}`);
 
