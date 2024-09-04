@@ -11,7 +11,7 @@ import { LogMessage } from "../utils/Logs";
 import { TBTCVaultABI } from "../interfaces/testnet/TBTCVaultSepolia";
 import { cleanFinalizedDeposits, cleanQueuedDeposits } from "./CleanupDeposits";
 import { attempInitializeDeposit, initializeDeposits } from "./InitializeDeposits";
-import { attempFinalizeDeposit, finalizeDeposit } from "./FinalizeDeposits";
+import { attempFinalizeDeposit, finalizeDeposits } from "./FinalizeDeposits";
 
 // ---------------------------------------------------------------
 // Environment Variables
@@ -73,7 +73,7 @@ export const startCronJobs = () => {
 
 	// Every minute (but only launch after 5 minutes - Check TIME_TO_RETRY)
 	cron.schedule("* * * * *", async () => {
-		finalizeDeposit();
+		finalizeDeposits();
 		initializeDeposits();
 	});
 

@@ -26,12 +26,12 @@ https://www.notion.so/thresholdnetwork/L2-tBTC-SDK-Relayer-Implementation-4dfeda
 // ----------------------------------------------------------
 
 /**
- * @name finalizeDeposit
+ * @name finalizeDeposits
  * @description Retrieves all deposits that are in the initialized state and attempts to update their status to "FINALIZED" by checking and updating the JSON storage.
  * @returns {Promise<void>} A promise that resolves when all deposits have been checked and their statuses have been updated.
  */
 
-export const finalizeDeposit = async (): Promise<void> => {
+export const finalizeDeposits = async (): Promise<void> => {
 	try {
 		const initializedDeposits: Array<Deposit> = await getAllJsonOperationsInitialized();
 		if (initializedDeposits.length === 0) return;
@@ -44,7 +44,7 @@ export const finalizeDeposit = async (): Promise<void> => {
 
 		LogMessage(`FINALIZE | To be processed: ${filterDeposits.length} deposits`);
 
-		const promises: Promise<void>[] = initializedDeposits.map(async (deposit: Deposit) => {
+		const promises: Promise<void>[] = filterDeposits.map(async (deposit: Deposit) => {
 			// Update the last activity timestamp of the deposit
 			deposit = updateLastActivity(deposit);
 			// Check the status of the deposit in the contract
@@ -52,7 +52,7 @@ export const finalizeDeposit = async (): Promise<void> => {
 
 			if (status === DepositStatus.FINALIZED) {
 				updateFinalizedDeposit(deposit, "Deposit already finalized");
-			} else if (DepositStatus.INITIALIZED) {
+			} else if (status === DepositStatus.INITIALIZED) {
 				await attempFinalizeDeposit(deposit);
 			}
 		});
