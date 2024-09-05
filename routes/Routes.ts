@@ -16,9 +16,9 @@ router.get("/", utils.defaultController);
 router.get("/status", utils.pingController);
 
 // Diagnostic route for the API
-router.get("/diagnostic", operations.getAllOperations);
-router.get("/diagnostic/queued", operations.getAllQueuedOperations);
-router.get("/diagnostic/initialized", operations.getAllInitializedOperations);
-router.get("/diagnostic/finalized", operations.getAllFinalizedOperations);
+router.get("/diagnostics", operations.getAllOperations);
+router.get("/diagnostics/queued", operations.getAllQueuedOperations);
+router.get("/diagnostics/initialized", operations.getAllInitializedOperations);
+router.get("/diagnostics/finalized", operations.getAllFinalizedOperations);
 
 export default router;
