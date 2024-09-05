@@ -1,11 +1,6 @@
 import { Request, Response } from "express";
 import CustomResponse from "../helpers/CustomResponse.helper";
-import {
-	getAllJsonOperations,
-	getAllJsonOperationsFinalized,
-	getAllJsonOperationsInitialized,
-	getAllJsonOperationsQueued,
-} from "../utils/JsonUtils";
+import { getAllJsonOperations, getAllJsonOperationsByStatus } from "../utils/JsonUtils";
 import { LogError } from "../utils/Logs";
 import { Deposit } from "../types/Deposit.type";
 
@@ -47,7 +42,7 @@ export default class Operations {
 		const response = new CustomResponse(res);
 
 		try {
-			const operations: Array<Deposit> = await getAllJsonOperationsQueued();
+			const operations: Array<Deposit> = await getAllJsonOperationsByStatus("QUEUED");
 			return response.ok("OK - Retrieved all queued operations", operations);
 		} catch (err) {
 			LogError("🚀 ~ getAllQueuedOperations ~ err:", err as Error);
@@ -68,7 +63,7 @@ export default class Operations {
 		const response = new CustomResponse(res);
 
 		try {
-			const operations: Array<Deposit> = await getAllJsonOperationsInitialized();
+			const operations: Array<Deposit> = await getAllJsonOperationsByStatus("INITIALIZED");
 			return response.ok("OK - Retrieved all initialized operations", operations);
 		} catch (err) {
 			LogError("🚀 ~ getAllInitializedOperations ~ err:", err as Error);
@@ -89,7 +84,7 @@ export default class Operations {
 		const response = new CustomResponse(res);
 
 		try {
-			const operations: Array<Deposit> = await getAllJsonOperationsFinalized();
+			const operations: Array<Deposit> = await getAllJsonOperationsByStatus("FINALIZED");
 			return response.ok("OK - Retrieved all finalized operations", operations);
 		} catch (err) {
 			LogError("🚀 ~ getAllFinalizedOperations ~ err:", err as Error);

@@ -1,7 +1,7 @@
 import { Deposit } from "../types/Deposit.type";
 import { DepositStatus } from "../types/DepositStatus.enum";
 import { updateInitializedDeposit, updateLastActivity } from "../utils/Deposits";
-import { getAllJsonOperationsQueued, writeJson } from "../utils/JsonUtils";
+import { getAllJsonOperationsByStatus } from "../utils/JsonUtils";
 import { LogError, LogMessage } from "../utils/Logs";
 import { checkTxStatus, filterDepositsActivityTime } from "./CheckStatus";
 import { L1BitcoinDepositor } from "./Core";
@@ -32,7 +32,7 @@ https://www.notion.so/thresholdnetwork/L2-tBTC-SDK-Relayer-Implementation-4dfeda
  */
 export const initializeDeposits = async () => {
 	try {
-		const queuedDeposits: Array<Deposit> = await getAllJsonOperationsQueued();
+		const queuedDeposits: Array<Deposit> = await getAllJsonOperationsByStatus("QUEUED");
 		if (queuedDeposits.length === 0) return;
 
 		// Filter deposits that have more than 5 minutes since the last activity

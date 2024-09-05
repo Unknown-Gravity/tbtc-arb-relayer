@@ -91,30 +91,13 @@ const getAllJsonOperations = async (): Promise<Array<Deposit>> => {
 };
 
 /**
- * Get all JSON operations in the QUEUED state
- * @returns {Array} List of JSON operations in the QUEUED state
+ * Get all JSON operations by status
+ * @param {String} status Operation status (QUEUED, FINALIZED, INITIALIZED)
+ * @returns {Array} List of JSON operations by status
  */
-const getAllJsonOperationsQueued = async (): Promise<Array<Deposit>> => {
-	const operations = await getAllJsonOperations();
-	return operations.filter((operation: Deposit) => operation.status === "QUEUED");
-};
-
-/**
- * Get all JSON operations in the FINALIZED state
- * @returns {Array} List of JSON operations in the FINALIZED state
- */
-const getAllJsonOperationsFinalized = async (): Promise<Array<Deposit>> => {
-	const operations = await getAllJsonOperations();
-	return operations.filter((operation: Deposit) => operation.status === "FINALIZED");
-};
-
-/**
- * Get all JSON operations in the INITIALIZED state
- * @returns {Array} List of JSON operations in the INITIALIZED state
- */
-const getAllJsonOperationsInitialized = async (): Promise<Array<Deposit>> => {
-	const operations = await getAllJsonOperations();
-	return operations.filter((operation: Deposit) => operation.status === "INITIALIZED");
+const getAllJsonOperationsByStatus = async (status: "QUEUED" | "FINALIZED" | "INITIALIZED"): Promise<Array<Deposit>> => {
+    const operations = await getAllJsonOperations();
+    return operations.filter((operation: Deposit) => operation.status === status);
 };
 
 // ---------------------------------------------------------------
@@ -205,7 +188,5 @@ export {
 	writeJson,
 	deleteJson,
 	getAllJsonOperations,
-	getAllJsonOperationsQueued,
-	getAllJsonOperationsFinalized,
-	getAllJsonOperationsInitialized,
+	getAllJsonOperationsByStatus,
 };
