@@ -1,5 +1,5 @@
 import { Deposit } from "../types/Deposit.type";
-import { deleteJson, getAllJsonOperationsFinalized, getAllJsonOperationsQueued } from "../utils/JsonUtils";
+import { deleteJson, getAllJsonOperationsByStatus } from "../utils/JsonUtils";
 import { LogMessage } from "../utils/Logs";
 
 /****************************************************************************************
@@ -19,29 +19,26 @@ https://www.notion.so/thresholdnetwork/L2-tBTC-SDK-Relayer-Implementation-4dfeda
  * @returns {Promise<void>} A promise that resolves when the old queued deposits are deleted.
  */
 
-const REMOVE_QUEUED_TIME: number = parseInt(process.env.CLEAN_QUEUED_TIME || "48", 10) * 60 * 60 * 1000;
+const REMOVE_QUEUED_TIME_MS: number = parseInt(process.env.CLEAN_QUEUED_TIME || "48", 10) * 60 * 60 * 1000;
 
 export const cleanQueuedDeposits = async (): Promise<void> => {
-	const operations: Deposit[] = await getAllJsonOperationsQueued();
-	if (operations.length === 0) return;
-
+	const operations: Deposit[] = await getAllJsonOperationsByStatus("QUEUED");
 	const currentTime = Date.now();
 
-	// Filter deposits that have been in the QUEUED state for more than 48 hours
-	const depositsToDelete = operations.filter((operation) => {
-		const createdAt = operation.dates.createdAt ? new Date(operation.dates.createdAt).getTime() : null;
-		return createdAt !== null && currentTime - createdAt > REMOVE_QUEUED_TIME;
-	});
+	// Filtrar y eliminar depósitos en una sola pasada, verificando que createdAt exista
+	operations.forEach(({ id, dates }) => {
+		const createdAt = dates?.createdAt ? new Date(dates.createdAt).getTime() : null;
+		if (!createdAt) return;
 
-	depositsToDelete.forEach((deposit) => {
-		const createdAtTime = deposit.dates.createdAt ? new Date(deposit.dates.createdAt).getTime() : 0;
-		const difference = currentTime - createdAtTime;
+		const ageInMs = currentTime - createdAt;
 
-		LogMessage(
-			`Deleting QUEUED deposit with ID ${deposit.id} | Actual: ${currentTime} | Creation: ${deposit.dates.createdAt} | Difference: ${difference}`
-		);
+		// Verifica si createdAt es válido antes de proceder
+		if (ageInMs > REMOVE_QUEUED_TIME_MS) {
+			const ageInHours = (ageInMs / (60 * 60 * 1000)).toFixed(2);
 
-		deleteJson(deposit.id);
+			LogMessage(`Deleting QUEUED ID: ${id} | Created: ${dates.createdAt} | Age: ${ageInHours} hours`);
+			deleteJson(id);
+		}
 	});
 };
 
@@ -51,30 +48,24 @@ export const cleanQueuedDeposits = async (): Promise<void> => {
  * @returns {Promise<void>} A promise that resolves when the old finalized deposits are deleted.
  */
 
-const REMOVE_FINALIZED_TIME: number = parseInt(process.env.CLEAN_FINALIZED_TIME || "12", 10) * 60 * 60 * 1000;
+const REMOVE_FINALIZED_TIME_MS: number = parseInt(process.env.CLEAN_FINALIZED_TIME || "12", 10) * 60 * 60 * 1000;
 
 export const cleanFinalizedDeposits = async (): Promise<void> => {
-	const operations: Deposit[] = await getAllJsonOperationsFinalized();
-	if (operations.length === 0) return;
-
+	const operations: Deposit[] = await getAllJsonOperationsByStatus("FINALIZED");
 	const currentTime = Date.now();
 
-	// Filter deposits that have been in the FINALIZED state for more than 12 hours
-	const depositsToDelete = operations.filter((operation) => {
-		const finalizationAt = operation.dates.finalizationAt
-			? new Date(operation.dates.finalizationAt).getTime()
-			: null;
-		return finalizationAt !== null && currentTime - finalizationAt > REMOVE_FINALIZED_TIME;
-	});
+	// Filter and delete deposits in a single pass, checking that finalizationAt exists
+	operations.forEach(({ id, dates }) => {
+		const finalizationAt = dates?.finalizationAt ? new Date(dates.finalizationAt).getTime() : null;
+		if (!finalizationAt) return;
 
-	depositsToDelete.forEach((deposit) => {
-		const createdAtTime = deposit.dates.createdAt ? new Date(deposit.dates.createdAt).getTime() : 0;
-		const difference = currentTime - createdAtTime;
+		const ageInMs = currentTime - finalizationAt;
 
-		LogMessage(
-			`Deleting FINALIZED deposit with ID ${deposit.id} | Actual: ${currentTime} | Creation: ${deposit.dates.createdAt} | Difference: ${difference}`
-		);
+		if (ageInMs > REMOVE_FINALIZED_TIME_MS) {
+			const ageInHours = (ageInMs / (60 * 60 * 1000)).toFixed(2);
 
-		deleteJson(deposit.id);
+			LogMessage(`Deleting FINALIZED ID: ${id} | Finalized: ${dates.finalizationAt} | Age: ${ageInHours} hours`);
+			deleteJson(id);
+		}
 	});
 };
