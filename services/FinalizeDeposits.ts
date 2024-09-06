@@ -34,13 +34,19 @@ https://www.notion.so/thresholdnetwork/L2-tBTC-SDK-Relayer-Implementation-4dfeda
 export const finalizeDeposits = async (): Promise<void> => {
 	try {
 		const initializedDeposits: Array<Deposit> = await getAllJsonOperationsByStatus("INITIALIZED");
-		if (initializedDeposits.length === 0) return;
+		if (initializedDeposits.length === 0) {
+			LogMessage(`No Initialized deposits have been found`);
+			return;
+		}
 
 		// Filter deposits that have more than 5 minutes since the last activity
 		// This is to avoid calling the contract for deposits that have been recently
 		// checked and are still in the same state
 		const filterDeposits = filterDepositsActivityTime(initializedDeposits);
-		if (filterDeposits.length === 0) return;
+		if (filterDeposits.length === 0){
+			LogMessage(`No Deposits have more than 5 minutes since the last activity`);
+			return;
+		}
 
 		LogMessage(`FINALIZE | To be processed: ${filterDeposits.length} deposits`);
 
