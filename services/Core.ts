@@ -2,13 +2,13 @@ import { BigNumber, ethers } from "ethers";
 import cron from "node-cron";
 import { NonceManager } from "@ethersproject/experimental";
 
-import { L1BitcoinDepositorABI } from "../interfaces/testnet/L1BitcoinDepositor";
-import { L2BitcoinDepositorABI } from "../interfaces/testnet/L2BitcoinDepositor";
+import { L1BitcoinDepositorABI } from "../interfaces/L1BitcoinDepositor";
+import { L2BitcoinDepositorABI } from "../interfaces/L2BitcoinDepositor";
 import { getJsonById, writeNewJsonDeposit } from "../utils/JsonUtils";
 import { createDeposit } from "../utils/Deposits";
 import { Deposit } from "../types/Deposit.type";
 import { LogMessage } from "../utils/Logs";
-import { TBTCVaultABI } from "../interfaces/testnet/TBTCVaultSepolia";
+import { TBTCVaultABI } from "../interfaces/TBTCVault";
 import { cleanFinalizedDeposits, cleanQueuedDeposits } from "./CleanupDeposits";
 import { attempInitializeDeposit, initializeDeposits } from "./InitializeDeposits";
 import { attempFinalizeDeposit, finalizeDeposits } from "./FinalizeDeposits";
@@ -20,7 +20,7 @@ const ARBITRUM_RPC: string = process.env.ARBITRUM_RPC || "";
 const ETHEREUM_RPC: string = process.env.ETHEREUM_RPC || "";
 const L1BitcoinDepositor_Address: string = process.env.L1BitcoinDepositor || "";
 const L2BitcoinDepositor_Address: string = process.env.L2BitcoinDepositor || "";
-const TBTCVaultAdress: string = process.env.TBTCVaultSepolia || "";
+const TBTCVaultAdress: string = process.env.TBTCVault || "";
 const privateKey: string = process.env.PRIVATE_KEY || "";
 
 export const TIME_TO_RETRY = 1000 * 60 * 5; // 5 minutes
