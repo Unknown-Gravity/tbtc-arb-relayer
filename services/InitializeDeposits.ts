@@ -30,7 +30,7 @@ https://www.notion.so/thresholdnetwork/L2-tBTC-SDK-Relayer-Implementation-4dfeda
  * @description Initialize all the deposits that we have in the storage
  * @returns {Promise<void>} A promise that resolves when the deposit status is updated in the JSON storage.
  */
-export const initializeDeposits = async () => {
+export const initializeDeposits = async (): Promise<void> => {
 	try {
 		const queuedDeposits: Array<Deposit> = await getAllJsonOperationsByStatus("QUEUED");
 		if (queuedDeposits.length === 0) return;
@@ -39,25 +39,24 @@ export const initializeDeposits = async () => {
 		// This is to avoid calling the contract for deposits that have been recently
 		// checked and are still in the same state
 
-		const filterDeposits = filterDepositsActivityTime(queuedDeposits);
-		if (filterDeposits.length === 0) return;
+		const filteredDeposits = filterDepositsActivityTime(queuedDeposits);
+		if (filteredDeposits.length === 0) return;
 
-		LogMessage(`INITIALIZE | To be processed: ${filterDeposits.length} deposits`);
+		LogMessage(`INITIALIZE | To be processed: ${filteredDeposits.length} deposits`);
 
-		const promises: Promise<void>[] = filterDeposits.map(async (deposit: Deposit) => {
+		const promises: Promise<void>[] = filteredDeposits.map(async (deposit: Deposit) => {
 			// Update the last activity timestamp of the deposit
-			deposit = updateLastActivity(deposit);
+			const updatedDeposit = updateLastActivity(deposit);
 			// Check the status of the deposit in the contract
-			const status = await checkTxStatus(deposit);
+			const status = await checkTxStatus(updatedDeposit);
 
 			if (status === DepositStatus.INITIALIZED) {
-				updateInitializedDeposit(deposit, "Deposit already initialized");
+				return updateInitializedDeposit(updatedDeposit, "Deposit already initialized");
 			} else if (status === DepositStatus.QUEUED) {
-				await attempInitializeDeposit(deposit);
+				return attempInitializeDeposit(updatedDeposit);
 			}
 		});
 
-		// Wait for all the promises to resolve
 		await Promise.all(promises);
 	} catch (error) {
 		LogError("Error in initializeDeposits:", error as Error);

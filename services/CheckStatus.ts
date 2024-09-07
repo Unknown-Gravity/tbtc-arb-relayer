@@ -18,8 +18,11 @@ export const checkTxStatus = async (deposit: Deposit): Promise<number> => {
 };
 
 export const filterDepositsActivityTime = (deposits: Array<Deposit>): Array<Deposit> => {
+	const now = Date.now();
+	const fiveMinutesAgo = now - TIME_TO_RETRY;
+
 	return deposits.filter((deposit: Deposit) => {
-		const isRetryTime = deposit.dates.lastActivityAt + TIME_TO_RETRY < Date.now();
-		return deposit.dates.lastActivityAt === null || isRetryTime;
+		const lastActivityAt = new Date(deposit.dates.lastActivityAt).getTime();
+		return lastActivityAt <= fiveMinutesAgo;
 	});
 };

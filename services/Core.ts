@@ -28,8 +28,22 @@ export const TIME_TO_RETRY = 1000 * 60 * 5; // 5 minutes
 // ---------------------------------------------------------------
 // Providers
 // ---------------------------------------------------------------
-const providerArb: ethers.providers.JsonRpcProvider = new ethers.providers.JsonRpcProvider(ARBITRUM_RPC);
-const providerEth: ethers.providers.JsonRpcProvider = new ethers.providers.JsonRpcProvider(ETHEREUM_RPC);
+const providerArb: ethers.providers.JsonRpcProvider = new ethers.providers.WebSocketProvider(ARBITRUM_RPC);
+const providerEth: ethers.providers.JsonRpcProvider = new ethers.providers.WebSocketProvider(ETHEREUM_RPC);
+
+providerArb.on("close", () => {
+	LogMessage("WebSocket connection lost. Reconnecting...");
+	setTimeout(() => {
+		createEventListeners();
+	}, 1000); // Retry in 1 second
+});
+
+providerEth.on("close", () => {
+	LogMessage("WebSocket connection lost. Reconnecting...");
+	setTimeout(() => {
+		createEventListeners();
+	}, 1000);
+});
 
 // ---------------------------------------------------------------
 // Signers
@@ -73,14 +87,12 @@ export const startCronJobs = () => {
 
 	// Every minute (but only launch after 5 minutes - Check TIME_TO_RETRY)
 	cron.schedule("* * * * *", async () => {
-		finalizeDeposits();
-		initializeDeposits();
+		await Promise.all([finalizeDeposits(), initializeDeposits()]);
 	});
 
 	// Every 10 minutes (but only launch after specified times)
 	cron.schedule("*/10 * * * *", async () => {
-		cleanQueuedDeposits();
-		cleanFinalizedDeposits();
+		await Promise.all([cleanQueuedDeposits(), cleanFinalizedDeposits()]);
 	});
 
 	LogMessage("Cron job setup complete.");
@@ -93,17 +105,26 @@ export const startCronJobs = () => {
 export const createEventListeners = () => {
 	LogMessage("Setting up event listeners...");
 
-	L2BitcoinDepositor.on("DepositInitialized", (fundingTx, reveal, l2DepositOwner, l2Sender) => {
-		const deposit: Deposit = createDeposit(fundingTx, reveal, l2DepositOwner, l2Sender);
-		writeNewJsonDeposit(fundingTx, reveal, l2DepositOwner, l2Sender);
-		LogMessage(`Initilizing deposit | Id: ${deposit.id}`);
-		attempInitializeDeposit(deposit);
+	L2BitcoinDepositor.on("DepositInitialized", async (fundingTx, reveal, l2DepositOwner, l2Sender) => {
+		try {
+			LogMessage(`Received DepositInitialized event for Tx: ${fundingTx}`);
+			const deposit: Deposit = createDeposit(fundingTx, reveal, l2DepositOwner, l2Sender);
+			writeNewJsonDeposit(fundingTx, reveal, l2DepositOwner, l2Sender);
+			LogMessage(`Initializing deposit | Id: ${deposit.id}`);
+			await attempInitializeDeposit(deposit);
+		} catch (error) {
+			LogMessage(`Error in DepositInitialized handler: ${error}`);
+		}
 	});
 
 	TBTCVault.on("OptimisticMintingFinalized", (minter, depositKey, depositor, optimisticMintingDebt) => {
-		const BigDepositKey = BigNumber.from(depositKey);
-		const deposit: Deposit | null = getJsonById(BigDepositKey.toString());
-		if (deposit) attempFinalizeDeposit(deposit);
+		try {
+			const BigDepositKey = BigNumber.from(depositKey);
+			const deposit: Deposit | null = getJsonById(BigDepositKey.toString());
+			if (deposit) attempFinalizeDeposit(deposit);
+		} catch (error) {
+			LogMessage(`Error in the OptimisticMintingFinalized handler: ${error}`);
+		}
 	});
 
 	LogMessage("Event listeners setup complete.");
