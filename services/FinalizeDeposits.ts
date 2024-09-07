@@ -43,25 +43,27 @@ export const finalizeDeposits = async (): Promise<void> => {
 		// This is to avoid calling the contract for deposits that have been recently
 		// checked and are still in the same state
 		const filteredDeposits = filterDepositsActivityTime(initializedDeposits);
-		if (filteredDeposits.length === 0) {
+		if (filteredDeposits.length === 0){
 			LogMessage(`No Deposits have more than 5 minutes since the last activity`);
 			return;
 		}
 
 		LogMessage(`FINALIZE | To be processed: ${filteredDeposits.length} deposits`);
 
-		for (const deposit of filteredDeposits) {
+		const promises: Promise<void>[] = filteredDeposits.map(async (deposit: Deposit) => {
 			// Update the last activity timestamp of the deposit
 			const updatedDeposit = updateLastActivity(deposit);
 			// Check the status of the deposit in the contract
 			const status = await checkTxStatus(updatedDeposit);
 
 			if (status === DepositStatus.FINALIZED) {
-				await updateFinalizedDeposit(updatedDeposit, "Deposit already finalized");
+				return updateFinalizedDeposit(updatedDeposit, "Deposit already finalized");
 			} else if (status === DepositStatus.INITIALIZED) {
-				await attempFinalizeDeposit(updatedDeposit);
+				return attempFinalizeDeposit(updatedDeposit);
 			}
-		}
+		});
+
+		await Promise.all(promises);
 	} catch (error) {
 		LogError("Error finalizing deposits", error as Error);
 	}

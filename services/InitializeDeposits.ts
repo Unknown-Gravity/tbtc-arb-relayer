@@ -44,18 +44,20 @@ export const initializeDeposits = async (): Promise<void> => {
 
 		LogMessage(`INITIALIZE | To be processed: ${filteredDeposits.length} deposits`);
 
-		for (const deposit of filteredDeposits) {
+		const promises: Promise<void>[] = filteredDeposits.map(async (deposit: Deposit) => {
 			// Update the last activity timestamp of the deposit
 			const updatedDeposit = updateLastActivity(deposit);
 			// Check the status of the deposit in the contract
 			const status = await checkTxStatus(updatedDeposit);
 
 			if (status === DepositStatus.INITIALIZED) {
-				await updateInitializedDeposit(updatedDeposit, "Deposit already initialized");
+				return updateInitializedDeposit(updatedDeposit, "Deposit already initialized");
 			} else if (status === DepositStatus.QUEUED) {
-				await attempInitializeDeposit(updatedDeposit);
+				return attempInitializeDeposit(updatedDeposit);
 			}
-		}
+		});
+
+		await Promise.all(promises);
 	} catch (error) {
 		LogError("Error in initializeDeposits:", error as Error);
 	}
