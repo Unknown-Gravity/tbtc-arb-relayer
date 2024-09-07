@@ -30,7 +30,7 @@ https://www.notion.so/thresholdnetwork/L2-tBTC-SDK-Relayer-Implementation-4dfeda
  * @description Initialize all the deposits that we have in the storage
  * @returns {Promise<void>} A promise that resolves when the deposit status is updated in the JSON storage.
  */
-export const initializeDeposits = async () => {
+export const initializeDeposits = async (): Promise<void> => {
 	try {
 		const queuedDeposits: Array<Deposit> = await getAllJsonOperationsByStatus("QUEUED");
 		if (queuedDeposits.length === 0) return;
@@ -51,9 +51,9 @@ export const initializeDeposits = async () => {
 			const status = await checkTxStatus(deposit);
 
 			if (status === DepositStatus.INITIALIZED) {
-				updateInitializedDeposit(deposit, "Deposit already initialized");
+				return updateInitializedDeposit(deposit, "Deposit already initialized");
 			} else if (status === DepositStatus.QUEUED) {
-				await attempInitializeDeposit(deposit);
+				return attempInitializeDeposit(deposit);
 			}
 		});
 

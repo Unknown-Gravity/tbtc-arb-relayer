@@ -57,9 +57,9 @@ export const finalizeDeposits = async (): Promise<void> => {
 			const status = await checkTxStatus(deposit);
 
 			if (status === DepositStatus.FINALIZED) {
-				updateFinalizedDeposit(deposit, "Deposit already finalized");
+				return updateFinalizedDeposit(deposit, "Deposit already finalized");
 			} else if (status === DepositStatus.INITIALIZED) {
-				await attempFinalizeDeposit(deposit);
+				return attempFinalizeDeposit(deposit);
 			}
 		});
 

@@ -82,7 +82,7 @@ export const createDeposit = (
  * @param {Deposit} deposit - The deposit object to be updated.
  * @param {any} tx - The transaction object containing the finalization transaction hash.
  */
-export const updateFinalizedDeposit = (deposit: Deposit, tx?: any, error?: string) => {
+export const updateFinalizedDeposit = async (deposit: Deposit, tx?: any, error?: string) => {
 	const newStatus = tx ? "FINALIZED" : deposit.status;
 	const newFinalizationAt = tx ? Date.now() : deposit.dates.finalizationAt;
 	const newHash = tx
@@ -121,7 +121,7 @@ export const updateFinalizedDeposit = (deposit: Deposit, tx?: any, error?: strin
  * @param {Deposit} deposit - The deposit object to be updated.
  * @param {any} tx - The transaction object containing the initialization transaction hash.
  */
-export const updateInitializedDeposit = (deposit: Deposit, tx?: any, error?: string) => {
+export const updateInitializedDeposit = async (deposit: Deposit, tx?: any, error?: string) => {
 	// Crear el objeto updatedDeposit con propiedades condicionales
 	const newStatus = tx ? "INITIALIZED" : deposit.status;
 	const newInitializationAt = tx ? Date.now() : deposit.dates.initializationAt;
