@@ -39,26 +39,23 @@ export const initializeDeposits = async (): Promise<void> => {
 		// This is to avoid calling the contract for deposits that have been recently
 		// checked and are still in the same state
 
-		const filterDeposits = filterDepositsActivityTime(queuedDeposits);
-		if (filterDeposits.length === 0) return;
+		const filteredDeposits = filterDepositsActivityTime(queuedDeposits);
+		if (filteredDeposits.length === 0) return;
 
-		LogMessage(`INITIALIZE | To be processed: ${filterDeposits.length} deposits`);
+		LogMessage(`INITIALIZE | To be processed: ${filteredDeposits.length} deposits`);
 
-		const promises: Promise<void>[] = filterDeposits.map(async (deposit: Deposit) => {
+		for (const deposit of filteredDeposits) {
 			// Update the last activity timestamp of the deposit
-			deposit = updateLastActivity(deposit);
+			const updatedDeposit = updateLastActivity(deposit);
 			// Check the status of the deposit in the contract
-			const status = await checkTxStatus(deposit);
+			const status = await checkTxStatus(updatedDeposit);
 
 			if (status === DepositStatus.INITIALIZED) {
-				return updateInitializedDeposit(deposit, "Deposit already initialized");
+				await updateInitializedDeposit(updatedDeposit, "Deposit already initialized");
 			} else if (status === DepositStatus.QUEUED) {
-				return attempInitializeDeposit(deposit);
+				await attempInitializeDeposit(updatedDeposit);
 			}
-		});
-
-		// Wait for all the promises to resolve
-		await Promise.all(promises);
+		}
 	} catch (error) {
 		LogError("Error in initializeDeposits:", error as Error);
 	}
