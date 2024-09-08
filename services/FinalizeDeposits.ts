@@ -1,6 +1,6 @@
 import { Deposit } from "../types/Deposit.type";
 import { DepositStatus } from "../types/DepositStatus.enum";
-import { updateFinalizedDeposit, updateLastActivity } from "../utils/Deposits";
+import { updateToFinalizedDeposit, updateLastActivity } from "../utils/Deposits";
 import { getAllJsonOperationsByStatus } from "../utils/JsonUtils";
 import { LogError, LogMessage } from "../utils/Logs";
 import { checkTxStatus, filterDepositsActivityTime } from "./CheckStatus";
@@ -43,27 +43,34 @@ export const finalizeDeposits = async (): Promise<void> => {
 		// This is to avoid calling the contract for deposits that have been recently
 		// checked and are still in the same state
 		const filteredDeposits = filterDepositsActivityTime(initializedDeposits);
-		if (filteredDeposits.length === 0){
+		if (filteredDeposits.length === 0) {
 			LogMessage(`No Deposits have more than 5 minutes since the last activity`);
 			return;
 		}
 
 		LogMessage(`FINALIZE | To be processed: ${filteredDeposits.length} deposits`);
 
-		const promises: Promise<void>[] = filteredDeposits.map(async (deposit: Deposit) => {
+		for (const deposit of filteredDeposits) {
 			// Update the last activity timestamp of the deposit
 			const updatedDeposit = updateLastActivity(deposit);
 			// Check the status of the deposit in the contract
 			const status = await checkTxStatus(updatedDeposit);
+			LogMessage(`L1BitcoinDepositor status | STATUS: ${status}`);
 
-			if (status === DepositStatus.FINALIZED) {
-				return updateFinalizedDeposit(updatedDeposit, "Deposit already finalized");
-			} else if (status === DepositStatus.INITIALIZED) {
-				return attempFinalizeDeposit(updatedDeposit);
+			switch (status) {
+				case DepositStatus.FINALIZED:
+					await updateToFinalizedDeposit(updatedDeposit, "Deposit already finalized");
+					break;
+
+				case DepositStatus.INITIALIZED:
+					await attemptToFinalizeDeposit(updatedDeposit);
+					break;
+
+				default:
+					LogMessage(`Unhandled deposit status: ${status}`);
+					break;
 			}
-		});
-
-		await Promise.all(promises);
+		}
 	} catch (error) {
 		LogError("Error finalizing deposits", error as Error);
 	}
@@ -74,13 +81,13 @@ export const finalizeDeposits = async (): Promise<void> => {
 // ----------------------------------------------------------
 
 /**
- * @name attemptFinalizeDeposit
+ * @name attemptToFinalizeDeposit
  * @description Attempts to finalize a deposit. If successful, updates the status of the deposit in the JSON storage.
  * @param {Deposit} deposit - The deposit object to be finalized.
  * @returns {Promise<void>} A promise that resolves when the deposit status is updated in the JSON storage.
  */
 
-export const attempFinalizeDeposit = async (deposit: Deposit): Promise<void> => {
+export const attemptToFinalizeDeposit = async (deposit: Deposit): Promise<void> => {
 	try {
 		const value = (await L1BitcoinDepositor.quoteFinalizeDeposit()).toString();
 
@@ -98,10 +105,10 @@ export const attempFinalizeDeposit = async (deposit: Deposit): Promise<void> => 
 		LogMessage(`FINALIZE | Transaction mined | ID: ${deposit.id} | TxHash: ${tx.hash}`);
 
 		// Update the deposit status in the JSON storage
-		updateFinalizedDeposit(deposit, tx);
+		updateToFinalizedDeposit(deposit, tx);
 	} catch (error: any) {
 		const reason = error.reason ? error.reason : "Unknown error";
 		LogError(`Error finalizing deposit | ID: ${deposit.id} | Reason: `, reason);
-		updateFinalizedDeposit(deposit, null, reason);
+		updateToFinalizedDeposit(deposit, null, reason);
 	}
 };

@@ -10,8 +10,8 @@ import { Deposit } from "../types/Deposit.type";
 import { LogMessage } from "../utils/Logs";
 import { TBTCVaultABI } from "../interfaces/TBTCVault";
 import { cleanFinalizedDeposits, cleanQueuedDeposits } from "./CleanupDeposits";
-import { attempInitializeDeposit, initializeDeposits } from "./InitializeDeposits";
-import { attempFinalizeDeposit, finalizeDeposits } from "./FinalizeDeposits";
+import { attemptToInitializeDeposit, initializeDeposits } from "./InitializeDeposits";
+import { attemptToFinalizeDeposit, finalizeDeposits } from "./FinalizeDeposits";
 
 // ---------------------------------------------------------------
 // Environment Variables
@@ -111,7 +111,7 @@ export const createEventListeners = () => {
 			const deposit: Deposit = createDeposit(fundingTx, reveal, l2DepositOwner, l2Sender);
 			writeNewJsonDeposit(fundingTx, reveal, l2DepositOwner, l2Sender);
 			LogMessage(`Initializing deposit | Id: ${deposit.id}`);
-			await attempInitializeDeposit(deposit);
+			await attemptToInitializeDeposit(deposit);
 		} catch (error) {
 			LogMessage(`Error in DepositInitialized handler: ${error}`);
 		}
@@ -121,7 +121,7 @@ export const createEventListeners = () => {
 		try {
 			const BigDepositKey = BigNumber.from(depositKey);
 			const deposit: Deposit | null = getJsonById(BigDepositKey.toString());
-			if (deposit) attempFinalizeDeposit(deposit);
+			if (deposit) attemptToFinalizeDeposit(deposit);
 		} catch (error) {
 			LogMessage(`Error in the OptimisticMintingFinalized handler: ${error}`);
 		}
