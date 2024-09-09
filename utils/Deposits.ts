@@ -74,7 +74,7 @@ export const createDeposit = (
 };
 
 /**
- * @name updateFinalizedDeposit
+ * @name updateToFinalizedDeposit
  * @description Updates the status of a deposit to "FINALIZED" and records the finalization transaction hash.
  * This function takes a deposit object and a transaction object, updates the deposit status to "FINALIZED",
  * records the finalization timestamp, and stores the finalization transaction hash in the deposit object.
@@ -82,7 +82,7 @@ export const createDeposit = (
  * @param {Deposit} deposit - The deposit object to be updated.
  * @param {any} tx - The transaction object containing the finalization transaction hash.
  */
-export const updateFinalizedDeposit = async (deposit: Deposit, tx?: any, error?: string) => {
+export const updateToFinalizedDeposit = async (deposit: Deposit, tx?: any, error?: string) => {
 	const newStatus = tx ? "FINALIZED" : deposit.status;
 	const newFinalizationAt = tx ? Date.now() : deposit.dates.finalizationAt;
 	const newHash = tx
@@ -113,7 +113,7 @@ export const updateFinalizedDeposit = async (deposit: Deposit, tx?: any, error?:
 };
 
 /**
- * @name updateInitializedDeposit
+ * @name updateToInitializedDeposit
  * @description Updates the status of a deposit to "INITIALIZED" and records the initialization transaction hash.
  * This function takes a deposit object and a transaction object, updates the deposit status to "INITIALIZED",
  * records the initialization timestamp, and stores the initialization transaction hash in the deposit object.
@@ -121,7 +121,7 @@ export const updateFinalizedDeposit = async (deposit: Deposit, tx?: any, error?:
  * @param {Deposit} deposit - The deposit object to be updated.
  * @param {any} tx - The transaction object containing the initialization transaction hash.
  */
-export const updateInitializedDeposit = async (deposit: Deposit, tx?: any, error?: string) => {
+export const updateToInitializedDeposit = async (deposit: Deposit, tx?: any, error?: string) => {
 	// Crear el objeto updatedDeposit con propiedades condicionales
 	const newStatus = tx ? "INITIALIZED" : deposit.status;
 	const newInitializationAt = tx ? Date.now() : deposit.dates.initializationAt;

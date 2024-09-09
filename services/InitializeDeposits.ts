@@ -1,6 +1,6 @@
 import { Deposit } from "../types/Deposit.type";
 import { DepositStatus } from "../types/DepositStatus.enum";
-import { updateInitializedDeposit, updateLastActivity } from "../utils/Deposits";
+import { updateToInitializedDeposit, updateLastActivity, updateToFinalizedDeposit } from "../utils/Deposits";
 import { getAllJsonOperationsByStatus } from "../utils/JsonUtils";
 import { LogError, LogMessage } from "../utils/Logs";
 import { checkTxStatus, filterDepositsActivityTime } from "./CheckStatus";
@@ -44,20 +44,32 @@ export const initializeDeposits = async (): Promise<void> => {
 
 		LogMessage(`INITIALIZE | To be processed: ${filteredDeposits.length} deposits`);
 
-		const promises: Promise<void>[] = filteredDeposits.map(async (deposit: Deposit) => {
+		for (const deposit of filteredDeposits) {
 			// Update the last activity timestamp of the deposit
 			const updatedDeposit = updateLastActivity(deposit);
+
 			// Check the status of the deposit in the contract
 			const status = await checkTxStatus(updatedDeposit);
+			LogMessage(`L1BitcoinDepositor status | STATUS: ${status}`);
 
-			if (status === DepositStatus.INITIALIZED) {
-				return updateInitializedDeposit(updatedDeposit, "Deposit already initialized");
-			} else if (status === DepositStatus.QUEUED) {
-				return attempInitializeDeposit(updatedDeposit);
+			switch (status) {
+				case DepositStatus.INITIALIZED:
+					await updateToInitializedDeposit(updatedDeposit, "Deposit already initialized");
+					break;
+
+				case DepositStatus.QUEUED:
+					await attemptToInitializeDeposit(updatedDeposit);
+					break;
+
+				case DepositStatus.FINALIZED:
+					await updateToFinalizedDeposit(updatedDeposit, "Deposit already finalized");
+					break;
+
+				default:
+					LogMessage(`Unhandled deposit status: ${status}`);
+					break;
 			}
-		});
-
-		await Promise.all(promises);
+		}
 	} catch (error) {
 		LogError("Error in initializeDeposits:", error as Error);
 	}
@@ -68,13 +80,13 @@ export const initializeDeposits = async (): Promise<void> => {
 // ----------------------------------------------------------
 
 /**
- * @name attempInitializeDeposit
+ * @name attemptToInitializeDeposit
  * @description Initialize one deposit
  * @param {Deposit} deposit - The deposit object to check and update.
  * @returns {Promise<void>} A promise that resolves when the deposit status is updated in the JSON storage.
  */
 
-export const attempInitializeDeposit = async (deposit: Deposit): Promise<void> => {
+export const attemptToInitializeDeposit = async (deposit: Deposit): Promise<void> => {
 	try {
 		LogMessage(`INITIALIZE | Pre-call checking... | ID: ${deposit.id}`);
 		// Pre-call
@@ -98,10 +110,10 @@ export const attempInitializeDeposit = async (deposit: Deposit): Promise<void> =
 		LogMessage(`INITIALIZE | Transaction mined | ID: ${deposit.id} | TxHash: ${tx.hash}`);
 
 		// Update the deposit status in the JSON storage
-		updateInitializedDeposit(deposit, tx);
+		updateToInitializedDeposit(deposit, tx);
 	} catch (error: any) {
 		const reason = error.reason ? error.reason : "Unknown error";
 		LogError(`INITIALIZE | ERROR | ID: ${deposit.id} | Reason: `, reason);
-		updateInitializedDeposit(deposit, null, reason);
+		updateToInitializedDeposit(deposit, null, reason);
 	}
 };
