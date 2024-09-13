@@ -20,7 +20,7 @@ export const checkForPastDeposits = async ({ pastTimeInHours }: { pastTimeInHour
             endBlock
         );
         // Process events
-        LogMessage(`Found ${events.length} DepositInitialized events in the last 24 hours`);
+        LogMessage(`Found ${events.length} DepositInitialized events in the last ${pastTimeInHours} hours`);
 
         for (const event of events) {
             const { fundingTx, reveal, l2DepositOwner, l2Sender } = event.args as any;

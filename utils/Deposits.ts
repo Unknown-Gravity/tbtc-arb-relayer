@@ -88,12 +88,12 @@ export const updateToFinalizedDeposit = async (deposit: Deposit, tx?: any, error
 	const newFinalizationAt = tx ? Date.now() : deposit.dates.finalizationAt;
 	const newHash = tx
 		? {
-				...deposit.hashes,
-				eth: {
-					...deposit.hashes.eth,
-					finalizeTxHash: tx?.hash ? tx.hash : null,
-				},
-		  }
+			...deposit.hashes,
+			eth: {
+				...deposit.hashes.eth,
+				finalizeTxHash: tx?.hash ? tx.hash : null,
+			},
+		}
 		: deposit.hashes;
 
 	// Crear el objeto updatedDeposit con propiedades condicionales
@@ -128,12 +128,12 @@ export const updateToInitializedDeposit = async (deposit: Deposit, tx?: any, err
 	const newInitializationAt = tx ? Date.now() : deposit.dates.initializationAt;
 	const newHash = tx
 		? {
-				...deposit.hashes,
-				eth: {
-					...deposit.hashes.eth,
-					initializeTxHash: tx?.hash ? tx.hash : null,
-				},
-		  }
+			...deposit.hashes,
+			eth: {
+				...deposit.hashes.eth,
+				initializeTxHash: tx?.hash ? tx.hash : null,
+			},
+		}
 		: deposit.hashes;
 
 	const updatedDeposit: Deposit = {
@@ -205,17 +205,33 @@ export const getDepositId = (fundingTxHash: string, fundingOutputIndex: number):
 };
 
 export const getBlocksByTimestamp = async (timestamp: number): Promise<{
-	startBlock: number, endBlock: number
+    startBlock: number;
+    endBlock: number;
 }> => {
-	const latestBlock = await providerArb.getBlock("latest");
-	let block = latestBlock.number;
-  
-	// Binary search to find block closest to the timestamp
-	while (true) {
-	  const blockData = await providerArb.getBlock(block);
-	  if (blockData.timestamp <= timestamp) {
-		return { startBlock: block, endBlock: latestBlock.number };
-	  }
-	  block -= 1000; // You can adjust this step to make it faster
-	}
-  }
+    const latestBlock = await providerArb.getBlock("latest");
+    const latestBlockNumber = latestBlock.number;
+
+    let low = 0;
+    let high = latestBlockNumber;
+    let startBlock = latestBlockNumber;
+
+    while (low <= high) {
+        const mid = Math.floor((low + high) / 2);
+        const blockData = await providerArb.getBlock(mid);
+
+        if (!blockData) {
+            high = mid - 1;
+            continue;
+        }
+
+        if (blockData.timestamp <= timestamp) {
+            startBlock = mid;
+            low = mid + 1;
+        } else {
+            high = mid - 1;
+        }
+    }
+
+    return { startBlock, endBlock: latestBlockNumber };
+};
+
