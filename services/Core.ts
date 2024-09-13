@@ -29,8 +29,8 @@ export const TIME_TO_RETRY = 1000 * 60 * 5; // 5 minutes
 // ---------------------------------------------------------------
 // Providers
 // ---------------------------------------------------------------
-const providerArb: ethers.providers.JsonRpcProvider = new ethers.providers.WebSocketProvider(ARBITRUM_RPC);
-const providerEth: ethers.providers.JsonRpcProvider = new ethers.providers.WebSocketProvider(ETHEREUM_RPC);
+export const providerArb: ethers.providers.JsonRpcProvider = new ethers.providers.WebSocketProvider(ARBITRUM_RPC);
+export const providerEth: ethers.providers.JsonRpcProvider = new ethers.providers.WebSocketProvider(ETHEREUM_RPC);
 
 providerArb.on("close", () => {
 	LogMessage("WebSocket connection lost. Reconnecting...");
