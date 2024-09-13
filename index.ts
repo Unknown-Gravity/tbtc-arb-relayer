@@ -18,6 +18,7 @@ import Routes from "./routes/Routes";
 import { LogMessage } from "./utils/Logs";
 import { createEventListeners, startCronJobs } from "./services/Core";
 import { checkAndCreateDataFolder } from "./utils/JsonUtils";
+import { checkForPastDeposits } from "./services/CheckForPastDeposits";
 
 // -------------------------------------------------------------------------
 // |                            APP CONFIG                                 |
@@ -72,6 +73,8 @@ app.listen(PORT, () => {
 	LogMessage(`Server running on port ${PORT}`);
 	// Create data folder
 	checkAndCreateDataFolder();
+	// Check for the past 24 hours deposits
+	checkForPastDeposits({ pastTimeInHours: 24 });
 	// Events
 	createEventListeners();
 	//CronJobs

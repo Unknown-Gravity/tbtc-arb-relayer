@@ -12,6 +12,7 @@ import { TBTCVaultABI } from "../interfaces/TBTCVault";
 import { cleanFinalizedDeposits, cleanQueuedDeposits } from "./CleanupDeposits";
 import { attemptToInitializeDeposit, initializeDeposits } from "./InitializeDeposits";
 import { attemptToFinalizeDeposit, finalizeDeposits } from "./FinalizeDeposits";
+import { checkForPastDeposits } from "./CheckForPastDeposits";
 
 // ---------------------------------------------------------------
 // Environment Variables
@@ -87,12 +88,19 @@ export const startCronJobs = () => {
 
 	// Every minute (but only launch after 5 minutes - Check TIME_TO_RETRY)
 	cron.schedule("* * * * *", async () => {
-		await Promise.all([finalizeDeposits(), initializeDeposits()]);
+		finalizeDeposits();
+		initializeDeposits();
 	});
 
 	// Every 10 minutes (but only launch after specified times)
 	cron.schedule("*/10 * * * *", async () => {
-		await Promise.all([cleanQueuedDeposits(), cleanFinalizedDeposits()]);
+		cleanQueuedDeposits();
+		cleanFinalizedDeposits();
+	});
+
+	// Set cron job to run every hour
+	cron.schedule("0 * * * *", async () => {
+		checkForPastDeposits({ pastTimeInHours: 24 });
 	});
 
 	LogMessage("Cron job setup complete.");
