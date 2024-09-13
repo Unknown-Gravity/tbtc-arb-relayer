@@ -1,5 +1,5 @@
 import { Deposit } from "../types/Deposit.type";
-import { createDeposit, getDepositId } from "../utils/Deposits";
+import { createDeposit, getBlocksByTimestamp, getDepositId } from "../utils/Deposits";
 import { getFundingTxHash } from "../utils/GetTransactionHash";
 import { getJsonById, writeNewJsonDeposit } from "../utils/JsonUtils";
 import { LogMessage } from "../utils/Logs";
@@ -8,15 +8,16 @@ import { attemptToInitializeDeposit } from "./InitializeDeposits";
 
 export const checkForPastDeposits = async ({ pastTimeInHours }: { pastTimeInHours: number }) => {
     LogMessage("Checking missed initializeDeposit transactions");
-    const currentTime = new Date();
-    const past24HoursTime = Date.now() - pastTimeInHours * 60 * 60 * 1000;
+    const currentTime = Math.floor(Date.now() / 1000);
+    const pastTime = currentTime - pastTimeInHours * 60 * 60;
+    const { startBlock, endBlock } = await getBlocksByTimestamp(pastTime);
 
     try {
         // Query events historically
         const events = await L1BitcoinDepositor.queryFilter(
             L1BitcoinDepositor.filters.DepositInitialized(),
-            past24HoursTime,
-            currentTime.getTime()
+            startBlock,
+            endBlock
         );
         // Process events
         LogMessage(`Found ${events.length} DepositInitialized events in the last 24 hours`);
@@ -41,5 +42,5 @@ export const checkForPastDeposits = async ({ pastTimeInHours }: { pastTimeInHour
     } catch (error) {
         LogMessage(`Error checking for missed initializeDeposit transactions: ${error}`);
     }
-    LogMessage("Hourly check for missed initializeDeposit transactions complete.");
+    LogMessage("Check for missed initializeDeposit transactions complete.");
 };

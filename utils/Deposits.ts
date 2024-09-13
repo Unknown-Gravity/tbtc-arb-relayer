@@ -4,6 +4,7 @@ import { FundingTransaction } from "../types/FundingTransaction.type";
 import { getFundingTxHash, getTransactionHash } from "./GetTransactionHash";
 import { writeJson } from "./JsonUtils";
 import { LogMessage } from "./Logs";
+import { providerArb } from "../services/Core";
 
 /**
  * @name createDeposit
@@ -202,3 +203,19 @@ export const getDepositId = (fundingTxHash: string, fundingOutputIndex: number):
 
 	return depositKey;
 };
+
+export const getBlocksByTimestamp = async (timestamp: number): Promise<{
+	startBlock: number, endBlock: number
+}> => {
+	const latestBlock = await providerArb.getBlock("latest");
+	let block = latestBlock.number;
+  
+	// Binary search to find block closest to the timestamp
+	while (true) {
+	  const blockData = await providerArb.getBlock(block);
+	  if (blockData.timestamp <= timestamp) {
+		return { startBlock: block, endBlock: latestBlock.number };
+	  }
+	  block -= 1000; // You can adjust this step to make it faster
+	}
+  }
