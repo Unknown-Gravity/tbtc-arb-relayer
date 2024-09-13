@@ -3,7 +3,7 @@ import { createDeposit, getBlocksByTimestamp, getDepositId } from "../utils/Depo
 import { getFundingTxHash } from "../utils/GetTransactionHash";
 import { getJsonById, writeNewJsonDeposit } from "../utils/JsonUtils";
 import { LogMessage } from "../utils/Logs";
-import { L1BitcoinDepositor } from "./Core";
+import { L2BitcoinDepositor } from "./Core";
 import { attemptToInitializeDeposit } from "./InitializeDeposits";
 
 export const checkForPastDeposits = async ({ pastTimeInHours }: { pastTimeInHours: number }) => {
@@ -14,8 +14,8 @@ export const checkForPastDeposits = async ({ pastTimeInHours }: { pastTimeInHour
 
     try {
         // Query events historically
-        const events = await L1BitcoinDepositor.queryFilter(
-            L1BitcoinDepositor.filters.DepositInitialized(),
+        const events = await L2BitcoinDepositor.queryFilter(
+            L2BitcoinDepositor.filters.DepositInitialized(),
             startBlock,
             endBlock
         );
