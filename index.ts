@@ -69,12 +69,12 @@ app.use(Routes);
 // |                              SERVER START                             |
 // -------------------------------------------------------------------------
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
 	LogMessage(`Server running on port ${PORT}`);
 	// Create data folder
 	checkAndCreateDataFolder();
 	// Check for the past 24 hours deposits
-	checkForPastDeposits({ pastTimeInHours: 24 });
+	await checkForPastDeposits({ pastTimeInHours: 24 });
 	// Events
 	createEventListeners();
 	//CronJobs

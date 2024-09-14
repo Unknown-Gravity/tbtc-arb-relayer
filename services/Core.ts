@@ -74,19 +74,19 @@ export const startCronJobs = () => {
 
 	// Every minute (but only launch after 5 minutes - Check TIME_TO_RETRY)
 	cron.schedule("* * * * *", async () => {
-		finalizeDeposits();
-		initializeDeposits();
+		await finalizeDeposits();
+		await initializeDeposits();
 	});
 
 	// Every 10 minutes (but only launch after specified times)
 	cron.schedule("*/10 * * * *", async () => {
-		cleanQueuedDeposits();
-		cleanFinalizedDeposits();
+		await cleanQueuedDeposits();
+		await cleanFinalizedDeposits();
 	});
 
 	// Set cron job to run every hour
 	cron.schedule("0 * * * *", async () => {
-		checkForPastDeposits({ pastTimeInHours: 24 });
+		await checkForPastDeposits({ pastTimeInHours: 1 });
 	});
 
 	LogMessage("Cron job setup complete.");
