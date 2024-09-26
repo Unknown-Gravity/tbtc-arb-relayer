@@ -69,28 +69,57 @@ export const TBTCVault: ethers.Contract = new ethers.Contract(TBTCVaultAdress, T
  */
 
 export const startCronJobs = () => {
-	//CRONJOBS
-	LogMessage("Starting cron job setup...");
+    // CRONJOBS
+    LogMessage("Starting cron job setup...");
 
-	// Every minute (but only launch after 5 minutes - Check TIME_TO_RETRY)
-	cron.schedule("* * * * *", async () => {
-		await finalizeDeposits();
-		await initializeDeposits();
-	});
+    const jobQueue: Array<() => Promise<void>> = [];
+    let isProcessing = false;
 
-	// Every 10 minutes (but only launch after specified times)
-	cron.schedule("*/10 * * * *", async () => {
-		await cleanQueuedDeposits();
-		await cleanFinalizedDeposits();
-	});
+    function processQueue() {
+        if (isProcessing) return;
+        isProcessing = true;
+        (async function () {
+            while (jobQueue.length > 0) {
+                const job = jobQueue.shift();
+                try {
+                    await job();
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+            isProcessing = false;
+        })();
+    }
 
-	// Set cron job to run every hour
-	cron.schedule("0 * * * *", async () => {
-		await checkForPastDeposits({ pastTimeInHours: 1 });
-	});
+    // Every minute
+    cron.schedule("* * * * *", () => {
+        jobQueue.push(async () => {
+            await finalizeDeposits();
+            await initializeDeposits();
+        });
+        processQueue();
+    });
 
-	LogMessage("Cron job setup complete.");
+    // Every 10 minutes
+    cron.schedule("*/10 * * * *", () => {
+        jobQueue.push(async () => {
+            await cleanQueuedDeposits();
+            await cleanFinalizedDeposits();
+        });
+        processQueue();
+    });
+
+    // Every hour
+    cron.schedule("0 * * * *", () => {
+        jobQueue.push(async () => {
+            await checkForPastDeposits({ pastTimeInHours: 1 });
+        });
+        processQueue();
+    });
+
+    LogMessage("Cron job setup complete.");
 };
+
 
 /**
  * @name createEventListeners
