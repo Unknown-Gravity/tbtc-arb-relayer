@@ -82,7 +82,9 @@ export const startCronJobs = () => {
             while (jobQueue.length > 0) {
                 const job = jobQueue.shift();
                 try {
-                    await job();
+                    if (job) {
+                        await job();
+                    }
                 } catch (e) {
                     console.error(e);
                 }
