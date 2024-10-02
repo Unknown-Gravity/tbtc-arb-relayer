@@ -6,6 +6,8 @@ import { writeJson } from "./JsonUtils";
 import { LogMessage } from "./Logs";
 import { providerArb } from "../services/Core";
 
+const START_BLOCK: number = parseInt(process.env.L2_START_BLOCK || "0");
+
 /**
  * @name createDeposit
  * @description Creates a new deposit object with the data provided by the event listener.
@@ -211,11 +213,14 @@ export const getBlocksByTimestamp = async (timestamp: number): Promise<{
     const latestBlock = await providerArb.getBlock("latest");
     const latestBlockNumber = latestBlock.number;
 
-    let low = 0;
+    let low = START_BLOCK;
     let high = latestBlockNumber;
-    let startBlock = latestBlockNumber;
+    let startBlock = -1;
+
+	console.log(`Starting binary search between blocks ${low} and ${high}`);
 
     while (low <= high) {
+		console.log(`Binary search iteration: low=${low}, high=${high}`);
         const mid = Math.floor((low + high) / 2);
         const blockData = await providerArb.getBlock(mid);
 
@@ -224,14 +229,20 @@ export const getBlocksByTimestamp = async (timestamp: number): Promise<{
             continue;
         }
 
-        if (blockData.timestamp <= timestamp) {
+        if (blockData.timestamp === timestamp) {
             startBlock = mid;
+            break;
+        } else if (blockData.timestamp < timestamp) {
             low = mid + 1;
+            startBlock = mid;
         } else {
             high = mid - 1;
         }
     }
 
+    if (startBlock === -1) {
+        startBlock = START_BLOCK;
+    }
+
     return { startBlock, endBlock: latestBlockNumber };
 };
-
