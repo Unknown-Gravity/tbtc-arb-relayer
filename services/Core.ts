@@ -29,8 +29,8 @@ export const TIME_TO_RETRY = 1000 * 60 * 5; // 5 minutes
 // ---------------------------------------------------------------
 // Providers
 // ---------------------------------------------------------------
-const providerArb: ethers.providers.JsonRpcProvider = new ethers.providers.JsonRpcProvider(ARBITRUM_RPC);
-const providerEth: ethers.providers.JsonRpcProvider = new ethers.providers.JsonRpcProvider(ETHEREUM_RPC);
+export const providerArb: ethers.providers.JsonRpcProvider = new ethers.providers.JsonRpcProvider(ARBITRUM_RPC);
+export const providerEth: ethers.providers.JsonRpcProvider = new ethers.providers.JsonRpcProvider(ETHEREUM_RPC);
 
 // ---------------------------------------------------------------
 // Signers
@@ -104,7 +104,8 @@ export const startCronJobs = () => {
 
     // Every hour
     cron.schedule("0 * * * *", async () => {
-        await checkForPastDeposits({ pastTimeInHours: 1 });
+        const latestBlock = await providerArb.getBlock("latest");
+        await checkForPastDeposits({ pastTimeInHours: 1 , latestBlock: latestBlock.number});
     });
 
     LogMessage("Cron job setup complete.");

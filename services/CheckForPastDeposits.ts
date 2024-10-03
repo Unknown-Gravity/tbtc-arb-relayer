@@ -6,12 +6,12 @@ import { LogMessage } from "../utils/Logs";
 import { L2BitcoinDepositor } from "./Core";
 import { attemptToInitializeDeposit } from "./InitializeDeposits";
 
-export const checkForPastDeposits = async ({ pastTimeInHours }: { pastTimeInHours: number }) => {
+export const checkForPastDeposits = async ({ pastTimeInHours, latestBlock }: { pastTimeInHours: number, latestBlock: number }) => {
     LogMessage("Checking missed initializeDeposit transactions");
     try {
         const currentTime = Math.floor(Date.now() / 1000);
         const pastTime = currentTime - pastTimeInHours * 60 * 60;
-        const { startBlock, endBlock } = await getBlocksByTimestamp(pastTime);
+        const { startBlock, endBlock } = await getBlocksByTimestamp(pastTime, latestBlock);
 
         // Query events historically
         const events = await L2BitcoinDepositor.queryFilter(

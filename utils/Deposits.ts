@@ -206,7 +206,7 @@ export const getDepositId = (fundingTxHash: string, fundingOutputIndex: number):
 	return depositKey;
 };
 
-export const getBlocksByTimestamp = async (timestamp: number): Promise<{
+export const getBlocksByTimestamp = async (timestamp: number, latestBlock: number): Promise<{
 	startBlock: number;
 	endBlock: number;
 }> => {
@@ -215,7 +215,6 @@ export const getBlocksByTimestamp = async (timestamp: number): Promise<{
 	let latestBlockNumber = 0;
 
 	try {
-		const latestBlock = await providerArb.getBlock("latest");
 		let high = latestBlock.number;
 		latestBlockNumber = high
 
