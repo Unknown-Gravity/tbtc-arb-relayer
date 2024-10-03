@@ -215,7 +215,7 @@ export const getBlocksByTimestamp = async (timestamp: number, latestBlock: numbe
 	let latestBlockNumber = 0;
 
 	try {
-		let high = latestBlock.number;
+		let high = latestBlock;
 		latestBlockNumber = high
 
 		console.log(`Starting binary search between blocks ${low} and ${high}`);
