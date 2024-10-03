@@ -21,7 +21,7 @@ const ARBITRUM_RPC: string = process.env.ARBITRUM_RPC || "";
 const ETHEREUM_RPC: string = process.env.ETHEREUM_RPC || "";
 const L1BitcoinDepositor_Address: string = process.env.L1BitcoinDepositor || "";
 const L2BitcoinDepositor_Address: string = process.env.L2BitcoinDepositor || "";
-const TBTCVaultAdress: string = process.env.TBTCVault || "";
+const TBTCVaultAddress: string = process.env.TBTCVault || "";
 const privateKey: string = process.env.PRIVATE_KEY || "";
 
 export const TIME_TO_RETRY = 1000 * 60 * 5; // 5 minutes
@@ -29,8 +29,8 @@ export const TIME_TO_RETRY = 1000 * 60 * 5; // 5 minutes
 // ---------------------------------------------------------------
 // Providers
 // ---------------------------------------------------------------
-export const providerArb: ethers.providers.JsonRpcProvider = new ethers.providers.WebSocketProvider(ARBITRUM_RPC);
-export const providerEth: ethers.providers.JsonRpcProvider = new ethers.providers.WebSocketProvider(ETHEREUM_RPC);
+const providerArb: ethers.providers.JsonRpcProvider = new ethers.providers.JsonRpcProvider(ARBITRUM_RPC);
+const providerEth: ethers.providers.JsonRpcProvider = new ethers.providers.JsonRpcProvider(ETHEREUM_RPC);
 
 // ---------------------------------------------------------------
 // Signers
@@ -43,7 +43,7 @@ const nonceManagerArb = new NonceManager(signerArb);
 const nonceManagerEth = new NonceManager(signerEth);
 
 // ---------------------------------------------------------------
-// Contracts
+// Contracts for signing transactions
 // ---------------------------------------------------------------
 export const L1BitcoinDepositor: ethers.Contract = new ethers.Contract(
 	L1BitcoinDepositor_Address,
@@ -57,7 +57,25 @@ export const L2BitcoinDepositor: ethers.Contract = new ethers.Contract(
 	nonceManagerArb
 );
 
-export const TBTCVault: ethers.Contract = new ethers.Contract(TBTCVaultAdress, TBTCVaultABI, signerEth);
+export const TBTCVault: ethers.Contract = new ethers.Contract(TBTCVaultAddress, TBTCVaultABI, signerEth);
+
+
+// ---------------------------------------------------------------
+// Contracts for event listening
+// ---------------------------------------------------------------
+const L1BitcoinDepositorProvider = new ethers.Contract(
+    L1BitcoinDepositor_Address,
+    L1BitcoinDepositorABI,
+    providerEth
+  );
+  
+  const L2BitcoinDepositorProvider = new ethers.Contract(
+    L2BitcoinDepositor_Address,
+    L2BitcoinDepositorABI,
+    providerArb
+  );
+  
+  const TBTCVaultProvider = new ethers.Contract(TBTCVaultAddress, TBTCVaultABI, providerEth);
 
 // ---------------------------------------------------------------
 // Cron Jobs
@@ -72,51 +90,21 @@ export const startCronJobs = () => {
     // CRONJOBS
     LogMessage("Starting cron job setup...");
 
-    const jobQueue: Array<() => Promise<void>> = [];
-    let isProcessing = false;
-
-    function processQueue() {
-        if (isProcessing) return;
-        isProcessing = true;
-        (async function () {
-            while (jobQueue.length > 0) {
-                const job = jobQueue.shift();
-                try {
-                    if (job) {
-                        await job();
-                    }
-                } catch (e) {
-                    console.error(e);
-                }
-            }
-            isProcessing = false;
-        })();
-    }
-
     // Every minute
-    cron.schedule("* * * * *", () => {
-        jobQueue.push(async () => {
-            await finalizeDeposits();
-            await initializeDeposits();
-        });
-        processQueue();
+    cron.schedule("* * * * *", async () => {
+        await finalizeDeposits();
+        await initializeDeposits();
     });
 
     // Every 10 minutes
-    cron.schedule("*/10 * * * *", () => {
-        jobQueue.push(async () => {
-            await cleanQueuedDeposits();
-            await cleanFinalizedDeposits();
-        });
-        processQueue();
+    cron.schedule("*/10 * * * *", async () => {
+        await cleanQueuedDeposits();
+        await cleanFinalizedDeposits();
     });
 
     // Every hour
-    cron.schedule("0 * * * *", () => {
-        jobQueue.push(async () => {
-            await checkForPastDeposits({ pastTimeInHours: 1 });
-        });
-        processQueue();
+    cron.schedule("0 * * * *", async () => {
+        await checkForPastDeposits({ pastTimeInHours: 1 });
     });
 
     LogMessage("Cron job setup complete.");
@@ -130,7 +118,7 @@ export const startCronJobs = () => {
 export const createEventListeners = () => {
 	LogMessage("Setting up event listeners...");
 
-	L2BitcoinDepositor.on("DepositInitialized", async (fundingTx, reveal, l2DepositOwner, l2Sender) => {
+	L2BitcoinDepositorProvider.on("DepositInitialized", async (fundingTx, reveal, l2DepositOwner, l2Sender) => {
 		try {
 			LogMessage(`Received DepositInitialized event for Tx: ${fundingTx}`);
 			const deposit: Deposit = createDeposit(fundingTx, reveal, l2DepositOwner, l2Sender);
@@ -142,7 +130,7 @@ export const createEventListeners = () => {
 		}
 	});
 
-	TBTCVault.on("OptimisticMintingFinalized", (minter, depositKey, depositor, optimisticMintingDebt) => {
+	TBTCVaultProvider.on("OptimisticMintingFinalized", (minter, depositKey, depositor, optimisticMintingDebt) => {
 		try {
 			const BigDepositKey = BigNumber.from(depositKey);
 			const deposit: Deposit | null = getJsonById(BigDepositKey.toString());

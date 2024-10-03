@@ -207,42 +207,47 @@ export const getDepositId = (fundingTxHash: string, fundingOutputIndex: number):
 };
 
 export const getBlocksByTimestamp = async (timestamp: number): Promise<{
-    startBlock: number;
-    endBlock: number;
+	startBlock: number;
+	endBlock: number;
 }> => {
-    const latestBlock = await providerArb.getBlock("latest");
-    const latestBlockNumber = latestBlock.number;
+	let startBlock = -1;
+	let low = START_BLOCK;
+	let latestBlockNumber = 0;
 
-    let low = START_BLOCK;
-    let high = latestBlockNumber;
-    let startBlock = -1;
+	try {
+		const latestBlock = await providerArb.getBlock("latest");
+		let high = latestBlock.number;
+		latestBlockNumber = high
 
-	console.log(`Starting binary search between blocks ${low} and ${high}`);
+		console.log(`Starting binary search between blocks ${low} and ${high}`);
 
-    while (low <= high) {
-		console.log(`Binary search iteration: low=${low}, high=${high}`);
-        const mid = Math.floor((low + high) / 2);
-        const blockData = await providerArb.getBlock(mid);
+		while (low <= high) {
+			console.log(`Binary search iteration: low=${low}, high=${high}`);
+			const mid = Math.floor((low + high) / 2);
+			const blockData = await providerArb.getBlock(mid);
 
-        if (!blockData) {
-            high = mid - 1;
-            continue;
-        }
+			if (!blockData) {
+				high = mid - 1;
+				continue;
+			}
 
-        if (blockData.timestamp === timestamp) {
-            startBlock = mid;
-            break;
-        } else if (blockData.timestamp < timestamp) {
-            low = mid + 1;
-            startBlock = mid;
-        } else {
-            high = mid - 1;
-        }
-    }
+			if (blockData.timestamp === timestamp) {
+				startBlock = mid;
+				break;
+			} else if (blockData.timestamp < timestamp) {
+				low = mid + 1;
+				startBlock = mid;
+			} else {
+				high = mid - 1;
+			}
+		}
 
-    if (startBlock === -1) {
-        startBlock = START_BLOCK;
-    }
+		if (startBlock === -1) {
+			startBlock = START_BLOCK;
+		}
+	} catch (error) {
+		LogMessage(`Error in the getBlocksByTimestamp: ${error}`);
+	}
 
-    return { startBlock, endBlock: latestBlockNumber };
+	return { startBlock, endBlock: latestBlockNumber };
 };

@@ -8,11 +8,11 @@ import { attemptToInitializeDeposit } from "./InitializeDeposits";
 
 export const checkForPastDeposits = async ({ pastTimeInHours }: { pastTimeInHours: number }) => {
     LogMessage("Checking missed initializeDeposit transactions");
-    const currentTime = Math.floor(Date.now() / 1000);
-    const pastTime = currentTime - pastTimeInHours * 60 * 60;
-    const { startBlock, endBlock } = await getBlocksByTimestamp(pastTime);
-
     try {
+        const currentTime = Math.floor(Date.now() / 1000);
+        const pastTime = currentTime - pastTimeInHours * 60 * 60;
+        const { startBlock, endBlock } = await getBlocksByTimestamp(pastTime);
+
         // Query events historically
         const events = await L2BitcoinDepositor.queryFilter(
             L2BitcoinDepositor.filters.DepositInitialized(),
