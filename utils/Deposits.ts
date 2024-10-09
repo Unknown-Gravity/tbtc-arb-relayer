@@ -4,6 +4,9 @@ import { FundingTransaction } from "../types/FundingTransaction.type";
 import { getFundingTxHash, getTransactionHash } from "./GetTransactionHash";
 import { writeJson } from "./JsonUtils";
 import { LogMessage } from "./Logs";
+import { providerArb } from "../services/Core";
+
+const START_BLOCK: number = parseInt(process.env.L2_START_BLOCK || "0");
 
 /**
  * @name createDeposit
@@ -87,12 +90,12 @@ export const updateToFinalizedDeposit = async (deposit: Deposit, tx?: any, error
 	const newFinalizationAt = tx ? Date.now() : deposit.dates.finalizationAt;
 	const newHash = tx
 		? {
-				...deposit.hashes,
-				eth: {
-					...deposit.hashes.eth,
-					finalizeTxHash: tx?.hash ? tx.hash : null,
-				},
-		  }
+			...deposit.hashes,
+			eth: {
+				...deposit.hashes.eth,
+				finalizeTxHash: tx?.hash ? tx.hash : null,
+			},
+		}
 		: deposit.hashes;
 
 	// Crear el objeto updatedDeposit con propiedades condicionales
@@ -127,12 +130,12 @@ export const updateToInitializedDeposit = async (deposit: Deposit, tx?: any, err
 	const newInitializationAt = tx ? Date.now() : deposit.dates.initializationAt;
 	const newHash = tx
 		? {
-				...deposit.hashes,
-				eth: {
-					...deposit.hashes.eth,
-					initializeTxHash: tx?.hash ? tx.hash : null,
-				},
-		  }
+			...deposit.hashes,
+			eth: {
+				...deposit.hashes.eth,
+				initializeTxHash: tx?.hash ? tx.hash : null,
+			},
+		}
 		: deposit.hashes;
 
 	const updatedDeposit: Deposit = {
@@ -201,4 +204,49 @@ export const getDepositId = (fundingTxHash: string, fundingOutputIndex: number):
 	const depositKey = ethers.BigNumber.from(hash).toString();
 
 	return depositKey;
+};
+
+export const getBlocksByTimestamp = async (timestamp: number, latestBlock: number): Promise<{
+	startBlock: number;
+	endBlock: number;
+}> => {
+	let startBlock = -1;
+	let low = START_BLOCK;
+	let latestBlockNumber = 0;
+
+	try {
+		let high = latestBlock;
+		latestBlockNumber = high
+
+		console.log(`Starting binary search between blocks ${low} and ${high}`);
+
+		while (low <= high) {
+			console.log(`Binary search iteration: low=${low}, high=${high}`);
+			const mid = Math.floor((low + high) / 2);
+			const blockData = await providerArb.getBlock(mid);
+
+			if (!blockData) {
+				high = mid - 1;
+				continue;
+			}
+
+			if (blockData.timestamp === timestamp) {
+				startBlock = mid;
+				break;
+			} else if (blockData.timestamp < timestamp) {
+				low = mid + 1;
+				startBlock = mid;
+			} else {
+				high = mid - 1;
+			}
+		}
+
+		if (startBlock === -1) {
+			startBlock = START_BLOCK;
+		}
+	} catch (error) {
+		LogMessage(`Error in the getBlocksByTimestamp: ${error}`);
+	}
+
+	return { startBlock, endBlock: latestBlockNumber };
 };
