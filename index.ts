@@ -69,7 +69,7 @@ app.use(Routes);
 // |                              SERVER START                             |
 // -------------------------------------------------------------------------
 
-app.listen(PORT, async () => {
+app.listen(PORT, () => {
 	LogMessage(`Server running on port ${PORT}`);
 	// Create data folder
 	checkAndCreateDataFolder();
