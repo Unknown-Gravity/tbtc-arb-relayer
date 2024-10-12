@@ -18,6 +18,7 @@ import Routes from "./routes/Routes";
 import { LogMessage } from "./utils/Logs";
 import { createEventListeners, startCronJobs } from "./services/Core";
 import { checkAndCreateDataFolder } from "./utils/JsonUtils";
+import { checkForPastDeposits } from "./services/CheckForPastDeposits";
 
 // -------------------------------------------------------------------------
 // |                            APP CONFIG                                 |
