@@ -96,16 +96,16 @@ export const startCronJobs = () => {
         await initializeDeposits();
     });
 
+    // Every 5 minutes
+    cron.schedule("*/5 * * * *", async () => {
+        const latestBlock = await providerArb.getBlock("latest");
+        await checkForPastDeposits({ pastTimeInMinutes: 5 , latestBlock: latestBlock.number});
+    });
+
     // Every 10 minutes
     cron.schedule("*/10 * * * *", async () => {
         await cleanQueuedDeposits();
         await cleanFinalizedDeposits();
-    });
-
-    // Every hour
-    cron.schedule("0 * * * *", async () => {
-        const latestBlock = await providerArb.getBlock("latest");
-        await checkForPastDeposits({ pastTimeInHours: 1 , latestBlock: latestBlock.number});
     });
 
     LogMessage("Cron job setup complete.");
