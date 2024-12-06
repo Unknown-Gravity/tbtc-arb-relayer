@@ -35,12 +35,12 @@ export const providerEth: ethers.providers.JsonRpcProvider = new ethers.provider
 // ---------------------------------------------------------------
 // Signers
 // ---------------------------------------------------------------
-const signerArb: ethers.Wallet = new ethers.Wallet(privateKey, providerArb);
-const signerEth: ethers.Wallet = new ethers.Wallet(privateKey, providerEth);
+export const signerArb: ethers.Wallet = new ethers.Wallet(privateKey, providerArb);
+export const signerEth: ethers.Wallet = new ethers.Wallet(privateKey, providerEth);
 
 //NonceManager Wallets
-const nonceManagerArb = new NonceManager(signerArb);
-const nonceManagerEth = new NonceManager(signerEth);
+export const nonceManagerArb = new NonceManager(signerArb);
+export const nonceManagerEth = new NonceManager(signerEth);
 
 // ---------------------------------------------------------------
 // Contracts for signing transactions

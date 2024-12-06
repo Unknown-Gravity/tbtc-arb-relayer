@@ -4,7 +4,7 @@ import { updateToInitializedDeposit, updateLastActivity, updateToFinalizedDeposi
 import { getAllJsonOperationsByStatus } from "../utils/JsonUtils";
 import { LogError, LogMessage } from "../utils/Logs";
 import { checkTxStatus, filterDepositsActivityTime } from "./CheckStatus";
-import { L1BitcoinDepositor } from "./Core";
+import { L1BitcoinDepositor, nonceManagerEth } from "./Core";
 
 /*****************************************************************************************
 This will initialise the QUEUED deposits in the L1BitcoinDepositor contract.
@@ -97,11 +97,13 @@ export const attemptToInitializeDeposit = async (deposit: Deposit): Promise<void
 		);
 		LogMessage(`INITIALIZE | Pre-call successful | ID: ${deposit.id}`);
 
+		const currentNonce = await nonceManagerEth.getTransactionCount("latest");
 		// Call
 		const tx = await L1BitcoinDepositor.initializeDeposit(
 			deposit.L1OutputEvent.fundingTx,
 			deposit.L1OutputEvent.reveal,
-			deposit.L1OutputEvent.l2DepositOwner
+			deposit.L1OutputEvent.l2DepositOwner,
+			{ nonce: currentNonce }
 		);
 
 		LogMessage(`INITIALIZE | Waiting to be mined | ID: ${deposit.id} | TxHash: ${tx.hash}`);
