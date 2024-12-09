@@ -4,7 +4,7 @@ import { updateToFinalizedDeposit, updateLastActivity } from "../utils/Deposits"
 import { getAllJsonOperationsByStatus } from "../utils/JsonUtils";
 import { LogError, LogMessage } from "../utils/Logs";
 import { checkTxStatus, filterDepositsActivityTime } from "./CheckStatus";
-import { L1BitcoinDepositor } from "./Core";
+import { L1BitcoinDepositor, nonceManagerEth } from "./Core";
 
 /*****************************************************************************************
 That will finalize INITIALIZED deposits in the L1BitcoinDepositor contract.
@@ -96,8 +96,9 @@ export const attemptToFinalizeDeposit = async (deposit: Deposit): Promise<void> 
 		await L1BitcoinDepositor.callStatic.finalizeDeposit(deposit.id, { value: value });
 		LogMessage(`FINALIZE | Pre-call successful | ID: ${deposit.id}`);
 
+		const currentNonce = await nonceManagerEth.getTransactionCount("latest");
 		// Call
-		const tx = await L1BitcoinDepositor.finalizeDeposit(deposit.id, { value: value });
+		const tx = await L1BitcoinDepositor.finalizeDeposit(deposit.id, { value: value }, { nonce: currentNonce });
 
 		LogMessage(`FINALIZE | Waiting to be mined | ID: ${deposit.id} | TxHash: ${tx.hash}`);
 		// Wait for the transaction to be mined
