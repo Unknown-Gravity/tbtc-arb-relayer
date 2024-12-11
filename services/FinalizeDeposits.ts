@@ -98,7 +98,7 @@ export const attemptToFinalizeDeposit = async (deposit: Deposit): Promise<void> 
 
 		const currentNonce = await nonceManagerEth.getTransactionCount("latest");
 		// Call
-		const tx = await L1BitcoinDepositor.finalizeDeposit(deposit.id, { value: value }, { nonce: currentNonce });
+		const tx = await L1BitcoinDepositor.finalizeDeposit(deposit.id, { value: value, nonce: currentNonce });
 
 		LogMessage(`FINALIZE | Waiting to be mined | ID: ${deposit.id} | TxHash: ${tx.hash}`);
 		// Wait for the transaction to be mined
